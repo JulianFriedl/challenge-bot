@@ -1,4 +1,6 @@
-import WeekCommand
+import commands.WeekCommand as WeekCommand
+import commands.StravaAuthCommand as StravaAuth
+import commands.TotalCommand as TotalCommand
 
 def handle_response(message) -> str:
     p_message = str(message.lower())
@@ -11,7 +13,9 @@ def handle_response(message) -> str:
             return 'Invalid Parameter!\nMake sure command is of type:\n("!week <Nr>", Nr...A Number indicating the calender week in range(1,52))'
         r
     elif p_message == '!total':
-        return 'total'
+        return TotalCommand.getYearlyPayments()
+    elif p_message == '!strava_auth':
+        return StravaAuth.stravaAuth()
     elif p_message == '!help':
         return 'Command: !week\n    Parameter: Week:int in range(1,52)\n    Returns the people who need to pay in the specified calender week\nCommand: !total\n    Parameter: none\n    Returns the total amount of money each participant has to pay.'
     return ''

@@ -1,10 +1,8 @@
-# Import the os module.
 import os
-# Import load_dotenv function from dotenv module.
 from dotenv import load_dotenv
 import discord
-
 import responses
+from flask_app import startFlask
 
 # Loads the .env file that resides on the same level as the script.
 load_dotenv()
@@ -19,6 +17,7 @@ bot = discord.Client(intents=intents)
 # EVENT LISTENER FOR WHEN THE BOT HAS SWITCHED FROM OFFLINE TO ONLINE.
 @bot.event
 async def on_ready():
+	startFlask()#start up the Webserver that is used for retrieving Strava auth
 	print(f'{bot.user} is now running!')
 
 # EVENT LISTENER FOR WHEN A NEW MESSAGE IS SENT TO A CHANNEL.
