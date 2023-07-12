@@ -141,8 +141,7 @@ def get_points(data, week):
         activity_date_str = activity["start_date_local"][:10] # Get only the YYYY-MM-DD part
 
         # Convert the activity date string to a date object
-        activity_date = datetime.date.fromisoformat(activity_date_str)
-
+        activity_date = datetime.datetime.strptime(activity_date_str, "%Y-%m-%d")
         # Get the week number of the activity date as an integer
         activity_week = activity_date.isocalendar()[1]
 
