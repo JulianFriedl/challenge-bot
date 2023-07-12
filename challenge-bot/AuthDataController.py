@@ -1,7 +1,7 @@
 import json
 import os
 
-FILENAME = './data/credentials.json'
+FILENAME = os.path.join('./data/credentials.json')
 
 def save_credentials(response):
     json_response = json.loads(response)
