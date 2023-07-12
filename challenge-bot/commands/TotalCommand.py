@@ -107,17 +107,16 @@ def getYearlyPayments() -> str:
 
                 # Print out an error message for debugging
                 return f"Error: Could not get activities for {username}. Status code: {response.status_code}"
-
-           
-    amount_to_pay = 0
-    # Loop through the weeks from CHALLENGE_START_WEEK to the current week number
-    for week in range(CHALLENGE_START_WEEK, current_week):
-         # Get the number of points for this athlete from the data and the week number
-        if WeekCommand.get_points(activities, week) < WeekCommand.POINTS_REQUIRED:
-            print(f"Pay in Week: {week}")
-            amount_to_pay += PRICE_PER_WEEK
-        # Store the points in the amounts dictionary
-        amounts[username] = amount_to_pay
+             
+        amount_to_pay = 0
+        # Loop through the weeks from CHALLENGE_START_WEEK to the current week number
+        for week in range(CHALLENGE_START_WEEK, current_week):
+            # Get the number of points for this athlete from the data and the week number
+            if WeekCommand.get_points(activities, week) < WeekCommand.POINTS_REQUIRED:
+                print(f"Pay in Week: {week}")
+                amount_to_pay += PRICE_PER_WEEK
+            # Store the points in the amounts dictionary
+            amounts[username] = amount_to_pay
 
 
     # Set up a variable to store the return string

@@ -15,10 +15,11 @@ RULES = {
     "Hike": 60, # Wandern
     "Walk": 60, # Spazieren
     "Swim": 30, # Schwimmen
-    "TeamSports": 60, # Volleyball/Basketball/Fußball
     "AlpineSki": 120, # Skifahren
     "RockClimbing": 60, # Bouldern/Klettern
-    "Workout": 0 # HIT Workout 2 HIT in der Woche = 1 Punkt
+    "Workout": 60, # HIT Workout 2 HIT in der Woche = 1 Punkt
+    "Snowshoe": 60,
+    "VirtualRide" : 60
 }
 
 # Set up a variable to store the number of points required
@@ -26,15 +27,20 @@ POINTS_REQUIRED = 3
 
 # Set up a variable to store the number of HIT workouts required
 HIT_REQUIRED = 2
+HIT_MIN_TIME = 10
 
 # tolorance for time required in minutes, for example if set to 1 will give points to activity "Run" duration: 29 min
-SPAZI = 0
+SPAZI = 3
+
+# Set a limit for the number of Walking activities count in a week
+WALKING_LIMIT = 2
+
+
 
 
 def getWhoNeedsToPay(week) -> str:
     
     loaded_creds = AuthDataController.load_credentials()
-    #print(json.dumps(loaded_creds))
     if loaded_creds == None:
         return ('There are no authenticate Athletes, please use the !strava_auth command.')
         # Calculate the start and end dates of the week
@@ -44,8 +50,6 @@ def getWhoNeedsToPay(week) -> str:
 
     # Get the current date as a date object
     current_date = datetime.date.today()
-    # Add one day to the start date to make it inclusive
-    start_date += datetime.timedelta(days=1)
     # Add one day to the end date to make it inclusive
     end_date += datetime.timedelta(days=1)
 
@@ -76,6 +80,7 @@ def getWhoNeedsToPay(week) -> str:
         username = cred["athlete"]["username"]
         access_token = cred["access_token"]
 
+
         # Set up the headers and params for the api call
         headers = {"Authorization": f"Bearer {access_token}"}
         params = {"before": end_date_seconds, "after": start_date_seconds}
@@ -93,32 +98,28 @@ def getWhoNeedsToPay(week) -> str:
             data = response.json()
             # Print out the data for debugging
             # print(f"Data: {data}")
-            # Count how many activities this athlete has done in this week
-            count = len(data)
 
-            # Store the count in the dictionary
-            activity_counts[username] = count
+            # Get the data for this athlete from the api response
+            data = response.json()
+
+            # Get the number of points for this athlete from the data
+            points = get_points(data, week)
+
+            # Check if the number of points is less than the points required if, before week 9 only two points were required
+            if points < (POINTS_REQUIRED if week > 9 else 2):
+                # This athlete needs to pay
+                return_string += f"{username} needs to pay because they only earned {points} point/s.\n"
+            else:
+                # This athlete does not need to pay
+                return_string += f"{username} does not need to pay because they earned {points} point/s.\n"
+
 
         else:
             # Handle unsuccessful response
             return_string += f"Error: Could not get activities for {username}. Status code: {response.status_code}\n"
 
 
-    # Loop through the activity counts and determine who needs to pay
-    for username, count in activity_counts.items():
-        # Get the data for this athlete from the api response
-        data = response.json()
 
-        # Get the number of points for this athlete from the data
-        points = get_points(data, week)
-
-        # Check if the number of points is less than the points required
-        if points < POINTS_REQUIRED:
-            # This athlete needs to pay
-            return_string += f"{username} needs to pay because they only earned {points} point/s.\n"
-        else:
-            # This athlete does not need to pay
-            return_string += f"{username} does not need to pay because they earned {points} point/s.\n"
 
 
     return return_string
@@ -140,17 +141,16 @@ def get_points(data, week):
         activity_duration = activity["elapsed_time"] / 60 # Convert seconds to minutes
         activity_date_str = activity["start_date_local"][:10] # Get only the YYYY-MM-DD part
         
-        print(activity_date_str)
         # Convert the activity date string to a date object
         activity_date = datetime.datetime.strptime(activity_date_str, "%Y-%m-%d")
         # Get the week number of the activity date as an integer
         activity_week = activity_date.isocalendar()[1]
-
+        
         # Check if the week number is equal to the week number parameter
         if activity_week == week:
             # The activity is in the given week, so we can check it against the rules
             # Check if the activity type is HIT Workout
-            if activity_type == "Workout":
+            if activity_type == "Workout" and activity_duration < (60-SPAZI) and activity_duration > HIT_MIN_TIME:
                 # Add one to the hit counter for this activity
                 hit_count += 1
 
@@ -176,16 +176,24 @@ def get_points(data, week):
 
                 # Check if the activity duration is equal or greater than the minimum duration
                 if activity_duration >= min_duration-SPAZI:
-                    # Check if this activity type has already been done in this day
+
+                    # Count the number of walks in the activities_done set
+                    walk_count = len([a for a in activities_done if a[0] == "Walk"])
+                    if walk_count >= 2 and activity_type == "Walk": # Only 2 walks per week are allowed
+                        print("No points for Walk because only 2 walks allowed")
+                        continue
+                    
+                    # Create a set of dates from the activities_done set
+                    dates_done = {a[1] for a in activities_done}
+                    # Check if a point has already been awarded for an activity today
                     # TODO Potential Bug here when with multiple activities and one the spans multiple days, not sure though might look into later
-                    if (activity_type, activity_date) not in activities_done:
+                    if activity_date not in dates_done:
                         # This activity type has not been done in this day, so we can count it
 
                         # Get the start date and elapsed time of the activity as strings
                         start_date_str = activity["start_date_local"]
                         elapsed_time_str = activity["elapsed_time"]
 
-                        
                         # Convert the start date string to a datetime object
                         start_date = datetime.datetime.strptime(start_date_str, "%Y-%m-%dT%H:%M:%SZ")
 
@@ -194,13 +202,22 @@ def get_points(data, week):
 
                         # Calculate the end date by adding the elapsed time to the start date because the end date isn't a required field in the api
                         end_date = start_date + elapsed_time
-
+                      
+                        
                         # Get the ordinal numbers of the start and end dates
                         start_ordinal = start_date.toordinal()
                         end_ordinal = end_date.toordinal()
 
-                        # Calculate the number of days that the activity spans
+                        # Calculate the number of days that the activity spans, only if the activity goes past midnight by the min_duration amount
                         days = end_ordinal - start_ordinal + 1
+                        
+                        # Calculate the time in minutes that has passed from midnight to end_date
+                        elapsed_time_past_midnight_min = end_date.hour * 60 + end_date.minute
+
+                        #TODO think of a good threshold for adding multiple points for an activity
+                        if elapsed_time_past_midnight_min < min_duration and days > 1:
+                            print(f"Not added {days} points because elapsed_time_past_midnight_min: {elapsed_time_past_midnight_min} which is under the treshold")
+                            days -= 1
 
                         # Add one point for each day that the activity spans
                         points += days
