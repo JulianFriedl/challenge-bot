@@ -1,13 +1,15 @@
 import json
 import os
 
-FILENAME = os.path.join('./data/credentials.json')
+BASE_PATH = os.path.dirname(__file__)
+DATA_PATH = os.path.join(os.path.dirname(BASE_PATH), 'data')
+FILENAME = os.path.join(DATA_PATH, 'credentials.json')
 
 def save_credentials(response):
     json_response = json.loads(response)
 
-    if not os.path.exists('./data'):
-        os.makedirs('./data')
+    if not os.path.exists(DATA_PATH):
+        os.makedirs(DATA_PATH)
     # and keyword has short circuit behavior -> if the first condition isn't met the second one is not evaluated 
     if os.path.exists(FILENAME) and os.path.getsize(FILENAME) != 0:
         with open(FILENAME, 'r') as f:
