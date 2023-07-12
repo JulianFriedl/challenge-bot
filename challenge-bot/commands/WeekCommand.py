@@ -4,6 +4,7 @@ import requests
 import datetime
 import time
 import AuthRefresh
+
 # Set up a dictionary to store the rules
 RULES = {
     "Ride": 60, # Radlfohrn
@@ -59,8 +60,10 @@ def getWhoNeedsToPay(week) -> str:
 
 
     # Convert the start and end dates to seconds since Unix epoch
-    start_date_seconds = time.mktime(datetime.datetime.strptime(start_date.isoformat(), "%Y-%m-%d").timetuple())
-    end_date_seconds = time.mktime(datetime.datetime.strptime(end_date.isoformat(), "%Y-%m-%d").timetuple())
+    # Convert the start and end dates to seconds since Unix epoch
+    start_date_seconds = time.mktime(start_date.timetuple()) # Option 1: remove datetime.fromisoformat()
+    end_date_seconds = time.mktime(end_date.timetuple())
+
 
     # Set up a dictionary to store the activity counts for each athlete
     activity_counts = {}

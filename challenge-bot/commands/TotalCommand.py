@@ -29,8 +29,8 @@ def getYearlyPayments() -> str:
     end_date = datetime.date(current_year, 12, 31)
 
     # Convert the start and end dates to seconds since Unix epoch
-    start_date_seconds = time.mktime(datetime.datetime.strptime(start_date.isoformat(), "%Y-%m-%d").timetuple())
-    end_date_seconds = time.mktime(datetime.datetime.strptime(end_date.isoformat(), "%Y-%m-%d").timetuple())
+    start_date_seconds = time.mktime(start_date.timetuple()) # Option 1: remove datetime.fromisoformat()
+    end_date_seconds = time.mktime(end_date.timetuple())
 
     # Load the credentials from the file
     loaded_creds = AuthDataController.load_credentials()
