@@ -139,7 +139,8 @@ def get_points(data, week):
         activity_type = activity["type"]
         activity_duration = activity["elapsed_time"] / 60 # Convert seconds to minutes
         activity_date_str = activity["start_date_local"][:10] # Get only the YYYY-MM-DD part
-
+        
+        print(activity_date_str)
         # Convert the activity date string to a date object
         activity_date = datetime.datetime.strptime(activity_date_str, "%Y-%m-%d")
         # Get the week number of the activity date as an integer
@@ -184,8 +185,9 @@ def get_points(data, week):
                         start_date_str = activity["start_date_local"]
                         elapsed_time_str = activity["elapsed_time"]
 
+                        
                         # Convert the start date string to a datetime object
-                        start_date = datetime.datetime.fromisoformat(start_date_str)
+                        start_date = datetime.datetime.strptime(start_date_str, "%Y-%m-%dT%H:%M:%SZ")
 
                         # Convert the elapsed time string to a timedelta object
                         elapsed_time = datetime.timedelta(seconds=int(elapsed_time_str))
