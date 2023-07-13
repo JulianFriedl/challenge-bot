@@ -28,7 +28,7 @@ STRAVA_REDIRECT_URI=http://YOUR_ADDRESS/strava_auth
 
 ## Usage
 
-- Run the `discord_bot.py` script to start the Discord bot and the Flask web server
+- Run the `bot_app.py` script to start the Discord bot and the Flask web server
 - Invite the bot to your Discord server using the following URL, replacing `YOUR_CLIENT_ID` with your Discord bot client ID:
 
 ```
