@@ -1,7 +1,17 @@
+"""
+file: flask_app.py
+
+description: This script sets up and runs the Flask web server, which listens for incoming
+authorization codes from the Strava API and passes them to the Discord bot.
+
+Author: Julian Friedl
+"""
+
 from flask import Flask, request
 from waitress import serve
 import threading
-import commands.StravaAuthCommand as StravaAuth
+
+import commands.strava_auth_command as StravaAuth
 
 app = Flask(__name__)
 
@@ -17,15 +27,17 @@ def strava_auth():
     # Extract the authorization code from the request
     code = request.args.get('code')
 
-    if(code != None):
+    if code:
         # Pass the authorization code to our Discord bot
-        StravaAuth.exchange_code(code)
-         # Return a response to the user
-        return 'Authorization successful! You can close this window.'
+        try:
+            StravaAuth.exchange_code(code)
+            # Return a response to the user
+            return 'Authorization successful! You can close this window.'
+        except Exception as e:
+            print(e)
+            return 'An error occurred while processing the authorization. You can close this window.'
     else:
         return 'Authorization declined! You can close this window.'
-
-   
 
 def run():
     """
@@ -35,7 +47,7 @@ def run():
     """
     serve(app, host='0.0.0.0', port=8000)
 
-def startFlask():
+def start_flask():
     """
     Starts the Flask app in a new thread.
 
@@ -44,4 +56,3 @@ def startFlask():
     """
     server = threading.Thread(target=run)
     server.start()
-
