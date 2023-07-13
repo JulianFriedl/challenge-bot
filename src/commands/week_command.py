@@ -165,9 +165,9 @@ class WeekCommand:
                 activities = result
             points = self.get_points(activities, athlete.username)
             if points < (self.POINTS_REQUIRED if self.week >= 9 else 2):
-                embed.add_field(name=athlete.username, value=f"Muas zoin! {points} Punkt/e.\n", inline=False)
+                embed.add_field(name=athlete.username, value=f"Muas zoin! {points} Punkt/e.\❌\n", inline=False)
             else:
-                embed.add_field(name=athlete.username, value=f"Muas net zoin! {points} Punkt/e.\n", inline=False)
+                embed.add_field(name=athlete.username, value=f"Muas net zoin! {points} Punkt/e.\✅\n", inline=False)
 
         return embed
 
