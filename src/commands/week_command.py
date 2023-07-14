@@ -176,7 +176,8 @@ class WeekCommand:
                 embed.add_field(name=athlete.username, value=f"Muas zoin! {points} Punkt/e.❌\n", inline=False)
             else:
                 embed.add_field(name=athlete.username, value=f"Muas net zoin! {points} Punkt/e.✅\n", inline=False)
-            embed.add_field(name="Api requests", value=f"{num_of_API_requests} Requests to the strava API. {num_of_retrieve_Cache} retrieved from cache.\n", inline=False)
+        
+        embed.add_field(name="Api requests", value=f"{num_of_API_requests} requests to the strava API. {num_of_retrieve_Cache} retrieved from cache.\n", inline=False)
 
         return embed
 

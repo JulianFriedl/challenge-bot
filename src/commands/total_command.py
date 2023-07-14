@@ -115,9 +115,9 @@ class TotalCommand:
 
         for username, amount in amounts.items():
             if amount > 0:
-                embed.add_field(name=username, value=f"muas {amount} euros für {year} zahlen.", inline=False)
+                embed.add_field(name=username, value=f"muas {amount} euro für {year} zahlen.", inline=False)
             else:
-                embed.add_field(name=username, value=f"muas nix für {year} zahlen.", inline=False)
-        embed.add_field(name="Api requests", value=f"{self.num_of_API_requests} Requests to the strava API. {self.num_of_retrieve_Cache} retrieved from cache.\n", inline=False)
+                embed.add_field(name=username, value=f"muas nix für {year} zahlen.💩", inline=False)
+        embed.add_field(name="Api requests", value=f"{self.num_of_API_requests} requests to the strava API. {self.num_of_retrieve_Cache} retrieved from cache.\n", inline=False)
 
         return embed
