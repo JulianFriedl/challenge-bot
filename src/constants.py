@@ -1,3 +1,10 @@
+"""
+file: constants.py
+
+description: This module contains all the constants that are used by the bot commands.
+
+Author: Julian Friedl
+"""
 CHALLENGE_START_WEEK = 5
 PRICE_PER_WEEK = 5
 RULES = {
