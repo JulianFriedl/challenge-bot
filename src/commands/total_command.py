@@ -113,11 +113,18 @@ class TotalCommand:
             color = discord.Color.blue()
         )
 
+      
+        # Find the user with the highest amount
+        max_user = max(amounts, key=amounts.get)
+        # Loop through the amounts and add fields to the embed
         for username, amount in amounts.items():
             if amount > 0:
-                embed.add_field(name=username, value=f"muas {amount} euro für {year} zahlen.", inline=False)
+                # Check if the user is the max user and add a special emoji
+                emoji = "🤑" if username == max_user else ""
+                embed.add_field(name=username, value=f"muas {amount} euro für {year} zahlen.{emoji}", inline=False)
             else:
                 embed.add_field(name=username, value=f"muas nix für {year} zahlen.💩", inline=False)
         embed.add_field(name="Api requests", value=f"{self.num_of_API_requests} requests to the strava API. {self.num_of_retrieve_Cache} retrieved from cache.\n", inline=False)
+
 
         return embed
