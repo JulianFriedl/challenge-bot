@@ -42,13 +42,12 @@ def api_request(url, headers=None, params=None, username=None):
         API_CALL_TYPE (Cache = 1 API = 2, Error = 3): Cache if the cache is used and API if the api is used and Error if error occurs
     """
     
-    # Create a hash of the url, headers and params to uniquely identify the request
-    req_hash = hashlib.md5()
+   # Create a hash of the url, headers and params to uniquely identify the request
+    req_hash = hashlib.sha256() 
     req_hash.update(url.encode('utf-8'))
     req_hash.update(str(headers).encode('utf-8'))
     req_hash.update(str(params).encode('utf-8'))
     cache_file = os.path.join(CACHE_DIR, req_hash.hexdigest())
-
     # If the cache file exists, load the cached response
     if os.path.exists(cache_file):
         with open(cache_file, 'rb') as f:
