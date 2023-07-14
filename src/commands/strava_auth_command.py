@@ -32,7 +32,8 @@ def strava_auth():
                         description=f'Please click [this link]({url}) to authorize the bot to access your Strava data.', 
                         color=discord.Color.blue())
     return embed
-    
+
+#TODO add error handling
 def exchange_code(code):
     """
     Exchanges the authorization code for an access token.
