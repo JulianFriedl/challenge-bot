@@ -11,6 +11,13 @@ import os
 import pickle
 import requests
 import discord
+from enum import Enum
+
+class API_CALL_TYPE(Enum):
+    Cache = 1
+    API = 2
+    Error = 3
+
 
 CACHE_DIR = './cache'
 os.makedirs(CACHE_DIR, exist_ok=True)  # make sure the directory exists
@@ -32,7 +39,7 @@ def api_request(url, headers=None, params=None, username=None):
     Returns:
         response (dict or None): The JSON response if the request was successful, otherwise None.
         error_embed (discord.Embed or None): None if the request was successful, otherwise a Discord embed with the error message.
-        Boolean(true or false): return false if the cache is used and true if the api is used
+        API_CALL_TYPE (Cache = 1 API = 2, Error = 3): Cache if the cache is used and API if the api is used and Error if error occurs
     """
     
     # Create a hash of the url, headers and params to uniquely identify the request
@@ -45,7 +52,7 @@ def api_request(url, headers=None, params=None, username=None):
     # If the cache file exists, load the cached response
     if os.path.exists(cache_file):
         with open(cache_file, 'rb') as f:
-            return pickle.load(f), None
+            return pickle.load(f), None, API_CALL_TYPE.Cache
 
     try:
         response = requests.get(url, headers=headers, params=params)
@@ -55,7 +62,7 @@ def api_request(url, headers=None, params=None, username=None):
         with open(cache_file, 'wb') as f:
             pickle.dump(response.json(), f)
 
-        return response.json(), None
+        return response.json(), None, API_CALL_TYPE.API
     except requests.exceptions.HTTPError as e:
         status_code = response.status_code
 
@@ -76,8 +83,8 @@ def api_request(url, headers=None, params=None, username=None):
             message = f"An error occurred while making the API request for user {username}. Status code: {status_code}"
 
         error_embed = discord.Embed(title="HTTP Error", description=message, color=discord.Color.red())
-        return None, error_embed
+        return None, error_embed, API_CALL_TYPE.Error
     except requests.exceptions.RequestException as e:
         message = f"An error occurred while making the API request for user {username}: {str(e)}"
         error_embed = discord.Embed(title="Request Error", description=message, color=discord.Color.red())
-        return None, error_embed
+        return None, error_embed, API_CALL_TYPE.Error

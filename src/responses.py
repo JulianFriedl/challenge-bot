@@ -8,10 +8,9 @@ Author: Julian Friedl
 
 import discord 
 
-import commands.week_command as week_command
 from commands.week_command import WeekCommand
 import commands.strava_auth_command as StravaAuth
-import commands.total_command as total_command
+from commands.total_command import TotalCommand
 
 def help_embed():
     embed = discord.Embed(title="Available Commands:", color=0x0073FF)
@@ -59,11 +58,9 @@ def handle_response(message) -> str:
             embed = discord.Embed(title="Invalid parameter!",
                 description="Invalid Parameter!\nMake sure command is of type:\n!week <Nr>, Nr...A Number indicating the calendar week in range(1,52).",
                 color=discord.Color.red())
-            return embed
-
-           
-            
+            return embed       
     elif p_message == '!total':
+        total_command = TotalCommand()
         return total_command.get_yearly_payments()
     elif p_message == '!strava_auth':
         return StravaAuth.strava_auth()

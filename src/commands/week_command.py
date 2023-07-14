@@ -12,8 +12,10 @@ import discord
 
 import services.auth_refresh as auth_refresh
 import services.auth_data_controller as auth_data_controller
+from utils.api_error_calls import API_CALL_TYPE
 from utils.api_error_calls import api_request
 from constants import RULES, SPAZI, WALKING_LIMIT, HIT_REQUIRED, HIT_MIN_TIME, MIN_DURATION_MULTI_DAY
+
 
 class Athlete:
     def __init__(self, credentials):
@@ -39,8 +41,8 @@ class Athlete:
         end_date_seconds = time.mktime(end_date.timetuple())
         headers = {"Authorization": f"Bearer {self.access_token}"}
         params = {"before": end_date_seconds, "after": start_date_seconds}
-        response, error_embed = api_request("https://www.strava.com/api/v3/athlete/activities", headers=headers, params=params, username=self.username)
-        return (response, error_embed)
+        response, error_embed, api_call_type  = api_request("https://www.strava.com/api/v3/athlete/activities", headers=headers, params=params, username=self.username)
+        return (response, error_embed, api_call_type)
 
 
 class Activity:
@@ -156,10 +158,16 @@ class WeekCommand:
             title=f"Woche {self.week}.",
             color=discord.Color.blue()
         )
+        num_of_API_requests = 0
+        num_of_retrieve_Cache = 0
         for cred in loaded_creds:
             athlete = Athlete(cred)
-            result, error_embed = athlete.fetch_activities(self.start_date, self.end_date)
-            if error_embed:
+            result, error_embed, api_call_type = athlete.fetch_activities(self.start_date, self.end_date)
+            if api_call_type == API_CALL_TYPE.API:
+                num_of_API_requests += 1
+            elif api_call_type == API_CALL_TYPE.Cache:
+                num_of_retrieve_Cache += 1
+            if api_call_type == API_CALL_TYPE.Error:
                 return error_embed
             else:
                 activities = result
@@ -168,6 +176,7 @@ class WeekCommand:
                 embed.add_field(name=athlete.username, value=f"Muas zoin! {points} Punkt/e.❌\n", inline=False)
             else:
                 embed.add_field(name=athlete.username, value=f"Muas net zoin! {points} Punkt/e.✅\n", inline=False)
+            embed.add_field(name="Api requests", value=f"{num_of_API_requests} Requests to the strava API. {num_of_retrieve_Cache} retrieved from cache.\n", inline=False)
 
         return embed
 
