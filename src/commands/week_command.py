@@ -23,7 +23,7 @@ class Athlete:
         This method refreshes the access token if need be, saves the updated credentials, and sets the username and access token.
         """
         self.credentials = auth_refresh.refresh_token(credentials)
-        self.username = self.credentials["athlete"]["username"]
+        self.username = self.credentials["athlete"]["firstname"] + " " + self.credentials["athlete"]["lastname"]
         self.access_token = self.credentials["access_token"]
         self.img = self.credentials["athlete"]["profile_medium"]
         auth_data_controller.save_credentials(json.dumps(self.credentials))
@@ -99,7 +99,7 @@ class Activity:
         if self.type in self.RULES_ACTIVITY and self.duration >= self.RULES_ACTIVITY[self.type] - self.SPAZI:
             walk_count = len([a for a in activities_done_set if a[0] == "Walk"])
             if walk_count >= self.WALKING_LIMIT and self.type == "Walk":
-                print(f"Did not add point for Walk because walk_count >= WALKING_LIMIT")
+                print(f"Did not add point for Walk because walk_count >= WALKING_LIMIT date: {self.date} type: {self.type}")
                 return points
             dates_done = {a[1] for a in activities_done_set}
             if self.date not in dates_done:
@@ -110,7 +110,7 @@ class Activity:
                 elapsed_time_past_midnight_min = end_date.hour * 60 + end_date.minute
 
                 if days > 1 and elapsed_time_past_midnight_min < self.MIN_DURATION_MULTI_DAY:
-                    print(f"Didn't add {days} points because elapsed_time_past_midnight_min: {elapsed_time_past_midnight_min} which is under the threshold")
+                    print(f"Didn't add {days} points because elapsed_time_past_midnight_min: {elapsed_time_past_midnight_min} which is under the threshold date: {self.start_date} type: {self.type}")
                     days -= 1
 
                 points += days

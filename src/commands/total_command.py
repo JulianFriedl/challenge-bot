@@ -35,7 +35,7 @@ def get_yearly_payments() -> discord.Embed:
     for cred in loaded_creds:
         cred = auth_refresh.refresh_token(cred)
         auth_data_controller.save_credentials(json.dumps(cred))
-        username = cred["athlete"]["username"]
+        username = cred["athlete"]["firstname"] + " " + cred["athlete"]["lastname"]
         access_token = cred["access_token"]
 
         activities, error_embed = fetch_athlete_activities(username, access_token, start_date_seconds, end_date_seconds, end_date)

@@ -32,6 +32,7 @@ def api_request(url, headers=None, params=None, username=None):
     Returns:
         response (dict or None): The JSON response if the request was successful, otherwise None.
         error_embed (discord.Embed or None): None if the request was successful, otherwise a Discord embed with the error message.
+        Boolean(true or false): return false if the cache is used and true if the api is used
     """
     
     # Create a hash of the url, headers and params to uniquely identify the request
