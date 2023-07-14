@@ -1,41 +1,20 @@
-# Caching and Hashing
+# Caching and Hashing in api_error_handling.py
 
-This document provides an overview of the concepts of caching and hashing, and how they're being used in the discord bot.
+The module contains api_error_handling.py a function for making API requests and handling HTTP errors.
 
 ## Caching
 
-Caching is a technique used in computing to store the result of an expensive or I/O bound operation, such as a network request or a complex computation, so that if the same operation is needed again, it can be retrieved from the cache instead of being recomputed or refetched.
+Caching is a technique of storing the results of previous requests in a local file system, so that they can be reused later without making another request to the same URL. This can improve the performance and efficiency of the program, as well as reduce the load on the API server.
 
-Caching is used to store the results of API requests. When the application makes an API request, it first checks if the result of this request is already in the cache. If it is, it retrieves and uses this result directly. If it's not, it goes ahead and makes the API request, then stores the result in the cache for future use.
+The function `api_request` uses caching by creating a hash of the URL, headers and parameters of the request, and using it as the name of the cache file. The hash ensures that each request has a unique identifier, and avoids collisions or overwriting of different requests. The function checks if the cache file exists before making the request, and if it does, it loads the cached response from the file and returns it. Otherwise, it makes the request to the API server, and saves the response in the cache file for future use.
 
-This caching is implemented using the `functools.lru_cache` decorator from Python's standard library. This decorator automatically handles the details of creating and managing the cache. It uses a Least Recently Used (LRU) strategy, meaning that when the cache is full, it discards the least recently used items first.
+The cache files are stored in a directory named `./cache`, which is created if it does not exist. The function uses the `pickle` module to serialize and deserialize the JSON responses to and from binary files.
 
-Here's a code snippet from the code that uses `functools.lru_cache`:
-
-```python
-@lru_cache(maxsize=128)
-def cached_api_request(url, headers=None, params=None):
-    ...
-```
+## Pickle
+The pickle module is used  to save and load the JSON responses from the API requests. `pickle.dump()` is used to write the JSON response to the cache file, and `pickle.load()` to read it back. This way, you can store and retrieve complex Python objects such as dictionaries in a binary format.
 
 ## Hashing
 
-Hashing is a technique used to map data of arbitrary size to fixed-size values. The values produced by a hash function, called hash codes, are used to index data in hash tables or databases, among other things.
+Hashing is a process of transforming any data into a fixed-length string of characters, called a hash or a digest, that uniquely represents the original data. Hashing is useful for comparing or identifying data, as well as for generating unique identifiers or keys.
 
-Hashing isn't directly used, but it's used implicitly by the `functools.lru_cache` decorator. This decorator uses the arguments to the decorated function to form the key used in the underlying cache. Since Python's dictionaries use hashes of their keys for quick access to values, `functools.lru_cache` also needs to be able to hash its keys.
-
-When you use complex objects (like dicts, lists, or custom classes) as arguments to a function decorated with `functools.lru_cache`, these need to be made hashable (able to be used as dictionary keys) since the built-in Python types for these are not hashable. The `frozenset` function is used to make the headers and params arguments hashable, like so:
-
-```python
-@lru_cache(maxsize=128)
-def cached_api_request(url, headers=frozenset(), params=frozenset()):
-    ...
-```
-
-Note that when the cached function is called, the `frozenset` function must also be used to convert the headers and params arguments to frozensets:
-
-```python
-response, error_embed = cached_api_request(url, frozenset(headers.items()), frozenset(params.items()))
-```
-
-This allows `functools.lru_cache` to correctly form a unique key for each unique combination of url, headers, and params, so that it can retrieve the correct cached result when needed.
+The function `api_request` uses hashing by importing the `hashlib` module and creating a SHA-256 hash object. The SHA-256 algorithm is a secure and widely used hashing algorithm that produces a 256-bit (32-byte) hash. The function updates the hash object with the URL, headers and parameters of the request, encoded as UTF-8 bytes. Then, it calls the `hexdigest` method to get the hexadecimal representation of the hash as a string. This string is used as the name of the cache file for that request.
