@@ -16,7 +16,7 @@ class TotalCommand:
     num_of_retrieve_Cache = 0
 
     
-    def get_yearly_payments(self) -> discord.Embed:
+    def get_yearly_payments(self):
         """
         Check yearly payments for each athlete and return a message indicating
         whether they need to pay or not for the current year. 
@@ -45,10 +45,10 @@ class TotalCommand:
             cred = auth_refresh.refresh_token(cred)
             auth_data_controller.save_credentials(json.dumps(cred))
             username = cred["athlete"]["firstname"] + " " + cred["athlete"]["lastname"]
+            user_id = cred["athlete"]["id"]
             access_token = cred["access_token"]
 
-            
-            activities, error_embed = self.fetch_athlete_activities(username, access_token, start_date_seconds, end_date_seconds, end_date)
+            activities, error_embed = self.fetch_athlete_activities(username, user_id, access_token, start_date_seconds, end_date_seconds, end_date)
 
             if error_embed is not None:
                 return error_embed
@@ -66,7 +66,7 @@ class TotalCommand:
         return self.create_payment_embed(amounts, current_year)
 
 
-    def fetch_athlete_activities(self, username: str, access_token: str, start_date_seconds: int, end_date_seconds: int, end_date: datetime) -> tuple:
+    def fetch_athlete_activities(self, username, user_id, access_token, start_date_seconds, end_date_seconds, end_date):
         activities = []
         page = 1
         per_page = 30
@@ -76,7 +76,7 @@ class TotalCommand:
             headers = {"Authorization": f"Bearer {access_token}"}
             params = {"before": end_date_seconds, "after": start_date_seconds, "page": page, "per_page": per_page}
 
-            data, error_embed, api_call_type = api_request("https://www.strava.com/api/v3/athlete/activities", headers, params, username)
+            data, error_embed, api_call_type = api_request("https://www.strava.com/api/v3/athlete/activities", headers, params, username, user_id)
             if api_call_type == API_CALL_TYPE.API:
                 self.num_of_API_requests += 1
             elif api_call_type == API_CALL_TYPE.Cache:
@@ -103,7 +103,7 @@ class TotalCommand:
 
         return activities, None
 
-    def create_payment_embed(self, amounts: dict, year: int) -> discord.Embed:
+    def create_payment_embed(self, amounts: dict, year: int):
         """
         Create a Discord Embed object based on the payment details of each athlete in the current year.
         """

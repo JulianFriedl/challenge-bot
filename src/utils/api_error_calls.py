@@ -18,11 +18,12 @@ class API_CALL_TYPE(Enum):
     API = 2
     Error = 3
 
+SRC_PATH = os.path.dirname(__file__)
+BASE_PATH = os.path.dirname(SRC_PATH)
+CACHE_Path = os.path.join(os.path.dirname(BASE_PATH), 'cache')
+os.makedirs(CACHE_Path, exist_ok=True)  # make sure the directory exists
 
-CACHE_DIR = './cache'
-os.makedirs(CACHE_DIR, exist_ok=True)  # make sure the directory exists
-
-def api_request(url, headers=None, params=None, username=None):
+def api_request(url, headers, params, username, user_id):
     """
     Makes a GET request to the specified URL and handles HTTP errors.
 
@@ -32,22 +33,29 @@ def api_request(url, headers=None, params=None, username=None):
 
     Args:
         url (str): The URL to make the request to.
-        username (str): The username for the request.
         headers (dict, optional): The headers for the request.
         params (dict, optional): The parameters for the request.
+        username (str): The username for the request.
+        id(str): the id of the user, used for encoding the cache with a unique filename
 
     Returns:
         response (dict or None): The JSON response if the request was successful, otherwise None.
         error_embed (discord.Embed or None): None if the request was successful, otherwise a Discord embed with the error message.
         API_CALL_TYPE (Cache = 1 API = 2, Error = 3): Cache if the cache is used and API if the api is used and Error if error occurs
     """
-    
+    #check if the cache dir exists
+    if not os.path.exists(CACHE_Path):
+        os.makedirs(CACHE_Path)
+
    # Create a hash of the url, headers and params to uniquely identify the request
     req_hash = hashlib.sha256() 
     req_hash.update(url.encode('utf-8'))
-    req_hash.update(str(headers).encode('utf-8'))
+    #req_hash.update(str(headers).encode('utf-8'))
+    #I am leaving out the headers because the auth token changes every 6 hours, so that would mean the cache expires at the same rate
+    #But to still be able to uniquely identify each cache file i will include the uid in the hash
+    req_hash.update(str(user_id).encode('utf-8'))
     req_hash.update(str(params).encode('utf-8'))
-    cache_file = os.path.join(CACHE_DIR, req_hash.hexdigest())
+    cache_file = os.path.join(CACHE_Path, req_hash.hexdigest())
     # If the cache file exists, load the cached response
     if os.path.exists(cache_file):
         with open(cache_file, 'rb') as f:

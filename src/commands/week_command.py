@@ -28,6 +28,7 @@ class Athlete:
         self.username = self.credentials["athlete"]["firstname"] + " " + self.credentials["athlete"]["lastname"]
         self.access_token = self.credentials["access_token"]
         self.img = self.credentials["athlete"]["profile_medium"]
+        self.user_id = self.credentials["athlete"]["id"]
         auth_data_controller.save_credentials(json.dumps(self.credentials))
 
     def fetch_activities(self, start_date, end_date):
@@ -41,7 +42,7 @@ class Athlete:
         end_date_seconds = time.mktime(end_date.timetuple())
         headers = {"Authorization": f"Bearer {self.access_token}"}
         params = {"before": end_date_seconds, "after": start_date_seconds}
-        response, error_embed, api_call_type  = api_request("https://www.strava.com/api/v3/athlete/activities", headers=headers, params=params, username=self.username)
+        response, error_embed, api_call_type  = api_request("https://www.strava.com/api/v3/athlete/activities", headers, params, self.username, self.user_id)
         return (response, error_embed, api_call_type)
 
 
@@ -87,6 +88,8 @@ class Activity:
             dates_done = {a[1] for a in activities_done_set}
             if self.date not in dates_done:
                 return hit_counter + 1
+            else:
+                print("↓Won't add point/increased hit_counter for workout/weight-training because a point was already earned on the day.↓")
         return hit_counter
 
     def calculate_points(self, activities_done_set):
@@ -202,9 +205,9 @@ class WeekCommand:
                     points += 1
                     activities_done_set.add((activity.type, activity.date))
                     hit_counter = 0
-                    print(f"{username} Added 1 point for hit_counter being equal to HIT_REQUIRED, total points now: {points} Date: {activity.date}")
+                    print(f"{username} Added 1 point for hit_counter being equal to HIT_REQUIRED, total points now: {points} Date: {activity.date} Type: {activity.type}")
                 else:
                     points_from_activity = activity.calculate_points(activities_done_set)
                     points += points_from_activity
-                    print(f"{username} Added {points_from_activity} point/s from activity, total points now: {points} Date: {activity.start_date} Type {activity.type}")
+                    print(f"{username} Added {points_from_activity} point/s from activity, total points now: {points} Date: {activity.start_date} Type: {activity.type}")
         return points
