@@ -158,7 +158,7 @@ class WeekCommand:
             return embed
 
         embed = discord.Embed(
-            title=f"Woche {self.week}.",
+            title=f"Woche {self.week}. *({self.start_date} - {self.end_date})*",
             color=discord.Color.blue()
         )
         num_of_API_requests = 0
