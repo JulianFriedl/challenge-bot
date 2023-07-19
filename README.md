@@ -1,5 +1,5 @@
 # challenge-bot
-A bot for discord, that connects to strava api and retrieves and evaluates certain data. It uses OAuth 2.0 to authenticate with the Strava API and obtain access tokens on behalf of the users. It also uses a Flask web server to handle the redirect from the Strava authorization page.
+A bot for discord, that connects to strava api and retrieves and evaluates certain data for an internal strava challenge between friends. It uses OAuth 2.0 to authenticate with the Strava API and obtain access tokens on behalf of the users. It also uses a Flask web server to handle the redirect from the Strava authorization page.
 
 
 ## Requirements
@@ -42,9 +42,8 @@ https://discord.com/api/oauth2/authorize?client_id=YOUR_CLIENT_ID&permissions=20
 ## Commands
 
 The following commands are available for the bot:
-
-- `!strava_auth`: Sends a link to the Strava authorization page, where you can grant permission for the bot to access your data. And exchanges the authorization code for an access token and stores it for future requests. You need to provide the authorization code that you received after granting permission.
-- `!strava_code <code>`: Exchanges the authorization code for an access token and stores it for future requests. You need to provide the authorization code that you received after granting permission.
+- `!help`: Displays every command and how to use it.
+- `!strava_auth`: Sends a link to the Strava authorization page, where you can grant permission for the bot to access your data. And exchanges the authorization code for an access token and stores it for future requests. 
 - `!week <Nr>:` This command requires a calendar week number as a parameter. When invoked, the bot performs several actions to provide data for the specified week:
     1. The bot checks if there are any registered athletes. If not, it notifies the user that there are no authenticated athletes and they should use the !strava_auth command.
     2. The bot validates if the requested week is not in the future. If the week is invalid, it returns an error.
@@ -54,6 +53,7 @@ The following commands are available for the bot:
     6. If the total points earned by the athlete is less than 3 (or 2 if the week number is less than 9), the bot states that the athlete needs to pay. If the points are equal to or greater than the threshold, the bot states that the athlete does not need to pay.
     7. The command returns a Discord embed message with the payment details for each athlete for the week.
 - `!total`: Returns all challenge members and the amount they have to pay.
-    1. `get_yearly_payments():` Returns a Discord embed containing each athlete's annual payment information. The annual payment is calculated based on the number of weeks an athlete didn't meet the required activity points.
-    2. `fetch_athlete_activities():` Retrieves an athlete's activity data for a specified year from the Strava API.
-    3. `create_payment_embed():` Creates a Discord embed containing the total annual payment information for each athlete.
+    1. Retrieves all registered athlete's activity data for a specified year from the Strava API.
+    2. Checks if the same rules from the week command apply for each Week in the retrieved year
+    3. Returns a Discord embed containing each athlete's annual payment information. The annual payment is calculated based on the number of weeks an athlete didn't meet the required activity points.
+    
