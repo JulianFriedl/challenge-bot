@@ -5,6 +5,7 @@ This module contains classes and functions for handling Strava challenge data.
 
 Author: Julian Friedl
 """
+
 import datetime
 import time
 import json

@@ -1,3 +1,11 @@
+"""
+total_command.py
+
+This module contains classes and functions for handling the total command.
+
+Author: Julian Friedl
+"""
+
 import datetime
 import time
 import requests
@@ -67,6 +75,15 @@ class TotalCommand:
 
 
     def fetch_athlete_activities(self, username, user_id, access_token, start_date_seconds, end_date_seconds, end_date):
+        """
+        Fetch all the activities in a year. The api can send a max of 30 Activities per request. 
+        By iterating over the page parameter until I either get an error or the returned data is null,
+        I get all the activities and append them to a list.
+
+        Returns:
+        activities (list of activities)
+        error_embed (discord.Embed or None): None if the request was successful, otherwise a Discord embed with the error message.
+        """
         activities = []
         page = 1
         per_page = 30

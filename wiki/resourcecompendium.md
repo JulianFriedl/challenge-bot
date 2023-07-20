@@ -5,8 +5,10 @@
 - [Python requests library tutorial](https://realpython.com/python-requests/)
 
 ## Discord Bots
-- [Making a Discord bot in Python](https://realpython.com/how-to-make-a-discord-bot-python/)
 - [Discord.py library](https://discordpy.readthedocs.io/en/stable/)
+- [Discord.py changelog app_commands](https://gist.github.com/Rapptz/c4324f17a80c94776832430007ad40e6): Explains some of the features of the namespace discord.app_command
+- [Discord.py App_commands Example 1](https://github.com/Rapptz/discord.py/blob/master/examples/app_commands/basic.py): Since there is no official docu of app_command and how to use it to create slash commands amongst other things, these examples are useful to understand some of the features.
+- [Discord.py App_commands Example 2](https://github.com/Rapptz/discord.py/blob/master/examples/app_commands/transformers.py)
 - [Discord bot intents - Doku](https://docs.pycord.dev/en/master/intents.html#privileged-intents): Explains the intents that are required for the api
 - [Discord bot intents - Problem-case](https://stackoverflow.com/questions/70920148/pycord-message-content-is-empty): A problem case that I had with the intents
 

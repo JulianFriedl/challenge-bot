@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This Flask app is designed to handle incoming requests at the `/strava_auth` endpoint. It is called when the user is redirected back to our application from the Strava authorization page after granting permission. It extracts the authorization code from the request and passes it to our Discord bot.
+This Flask app (Version: 2.3.2) is designed to handle incoming requests at the `/strava_auth` endpoint. It is called when the user is redirected back to our application from the Strava authorization page after granting permission. It extracts the authorization code from the request and passes it to our Discord bot.
 
 ## Usage
 
@@ -66,6 +66,6 @@ Flask works by using decorators to mark Python functions as endpoints for handli
 7. Test your code thoroughly.
 8. Make sure you know how to scale your app.
 
-### Waitress
+### Waitress (Version: 2.0.0)
 
-Waitress is a pure Python WSGI server that can be used to serve Flask applications1. It is easy to configure and supports Windows directly. It is easy to install as it does not require additional dependencies or compilation. However, it does not support streaming requests, and full request data is always buffered. It uses a single process with multiple thread workers.
+Waitress is a pure Python WSGI server that can be used to serve Flask applications. It is easy to configure and supports Windows directly. It is easy to install as it does not require additional dependencies or compilation. However, it does not support streaming requests, and full request data is always buffered. It uses a single process with multiple thread workers.

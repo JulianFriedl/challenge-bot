@@ -1,3 +1,11 @@
+"""
+strava_auth_command.py
+
+This module contains functions for handling the strava_auth command
+
+Author: Julian Friedl
+"""
+
 import requests
 from urllib.parse import urlencode
 import os
