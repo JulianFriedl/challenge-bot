@@ -33,7 +33,7 @@ the authorization code from the request and passes it to our Discord bot.
 
 If the authorization is successful, returns:
 
-    Copy Authorization successful! You can close this window.
+    Authorization successful! You can close this window.
 
 ---
 
