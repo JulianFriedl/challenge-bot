@@ -3,7 +3,7 @@
 First connect to the Vm on Google Cloud Platform using ssh. Then with nohup, you can run something like this:
 
 ```bash
-nohup python3 bot_app.py &
+nohup python3 src/bot_app.py &
 ```
 
 This will run the script in the background and redirect its output to a file called nohup.out. You can then close your SSH session and your script will keep running. To stop your script, you can use the kill command with the process ID of your script.The kill command is a command that sends a signal to a process to terminate it. The syntax of the kill command is:

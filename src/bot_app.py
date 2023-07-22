@@ -48,13 +48,13 @@ async def help_command(interaction: discord.Interaction):
     """Slash Command Implementation of the help_command"""
     #response.defer() is used to give the bot more time to reply to the discord api
     #(default time is 3 seconds with the new slash commands before it throws 404 exception)
-    await interaction.response.defer()
+    await interaction.response.defer(ephemeral=True)
     await interaction.followup.send(embed=help_embed(), ephemeral= True)
 
 @bot.tree.command(name = "strava_auth", description = "Initiates the Strava authorization process.")
 async def strava_auth_command(interaction: discord.Interaction):
     """Slash Command Implementation of the strava_auth_command"""
-    await interaction.response.defer()
+    await interaction.response.defer(ephemeral=True)
     await interaction.followup.send(embed=StravaAuth.strava_auth(), ephemeral= True)
 
 @bot.tree.command(name = "week", description = "Returns the people who need to pay in the specified calendar week")
