@@ -68,6 +68,38 @@ You can implement either option using both discord.Client or discord.Bot
 
 ---
 
+### Interactions
+
+Each command will take an interaction parameter of type discord.Interaction into the function.
+
+    interaction: discord.Interaction
+
+An interaction contains many important attributes that are relevant for your command.
+
+Here is a table of the most important attributes in the interaction and what they contain:
+
+| Attribute-Name | Contents |
+| --- | --- |
+| response | Returns an object responsible for handling the response to the interaction. |
+| user | The user who invoked the slash command. |
+| followup | Returns the follow up webhook for follow up interactions. |
+
+Here is a table of the most important methods in the response attribute and what they do:
+
+| Method-Name | Contents |
+| --- | --- |
+| defer | This method is important because it tells Discord that you will send a response later, within about 15 minutes. Otherwise, the slash command will fail after 3 seconds by default. If defer is used, the follow up will eventually have to be sent by using `interaction.followup.send("message")`. |
+| send_message | Responds to this interaction by sending a message. This will be a public message in the same channel as the slash command. |
+
+Here is a table of the most important methods in the user attribute and what they do:
+
+| Method-Name | Contents |
+| --- | --- |
+| send | Responds to this interaction by sending a message. This will be a private message to the user who invoked the slash command. |
+
+Of course there are many more useful attributes and methods native to discord.Interaction, and they can be found in the official 
+[Interactions API Reference Documentation](https://discordpy.readthedocs.io/en/stable/interactions/api.html#interaction).
+
 ### Defining Commands
 
 Commands are defined using decorators. The primary decorator for this is `@client.tree.command()`. 
