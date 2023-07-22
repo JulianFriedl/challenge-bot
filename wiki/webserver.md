@@ -10,7 +10,7 @@ To use the app, make a GET request to the `/strava_auth` endpoint with the `code
 
 The app will return:
 
-    Copy Authorization successful! You can close this window.
+    Authorization successful! You can close this window.
 
 
 ## API Reference
