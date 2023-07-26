@@ -34,7 +34,7 @@ class TotalCommand:
         current_week = datetime.date.today().isocalendar()[1]
 
         start_date = datetime.date(current_year, 1, 1)
-        end_date = datetime.date(current_year, 12, 31)
+        end_date = datetime.date(current_year, 12, 31)# TODO: change to last sunday (inclusive)
 
         start_date_seconds = time.mktime(start_date.timetuple())
         end_date_seconds = time.mktime(end_date.timetuple())

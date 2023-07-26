@@ -12,6 +12,8 @@ from dotenv import load_dotenv
 import discord
 from discord.ext import commands
 from discord import app_commands
+import asyncio
+
 
 from flask_app import start_flask  # Consider renaming this to be snake_case
 from commands.help_command import help_embed
@@ -57,20 +59,23 @@ async def strava_auth_command(interaction: discord.Interaction):
     await interaction.response.defer(ephemeral=True)
     await interaction.followup.send(embed=StravaAuth.strava_auth(), ephemeral= True)
 
-@bot.tree.command(name = "week", description = "Returns the people who need to pay in the specified calendar week")
+@bot.tree.command(name="week", description="Returns the people who need to pay in the specified calendar week")
 @app_commands.describe(week_parameter='*Parameter:* Week (an integer in range 1-52)')
-async def strava_auth_command(interaction: discord.Interaction, week_parameter:app_commands.Range[int, 1, 52]):
+async def week_command(interaction: discord.Interaction, week_parameter:app_commands.Range[int, 1, 52]):
     """Slash Command Implementation of the week_command"""
     await interaction.response.defer()
-    week_command = WeekCommand(week_parameter)
-    await interaction.followup.send(embed= week_command.get_who_needs_to_pay())
+    loop = asyncio.get_event_loop()
+    embed_result = await loop.run_in_executor(None, WeekCommand(week_parameter).get_who_needs_to_pay)
+    await interaction.followup.send(embed=embed_result)
 
-@bot.tree.command(name = "total", description = "Returns all challenge members and the amount they have to pay.")
-async def strava_auth_command(interaction: discord.Interaction):
+@bot.tree.command(name="total", description="Returns all challenge members and the amount they have to pay.")
+async def total_command(interaction: discord.Interaction):
     """Slash Command Implementation of the total_command"""
     await interaction.response.defer()
-    total_command = TotalCommand()
-    await interaction.followup.send(embed=total_command.get_yearly_payments())
+    loop = asyncio.get_event_loop()
+    embed_result = await loop.run_in_executor(None, TotalCommand().get_yearly_payments)
+    await interaction.followup.send(embed=embed_result)
+
 
 # Execute the bot with the specified token
 if __name__ == "__main__":

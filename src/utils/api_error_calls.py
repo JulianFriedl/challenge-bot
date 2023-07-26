@@ -64,7 +64,7 @@ def api_request(url, headers, params, username, user_id):
     try:
         response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()  # Raises a HTTPError if the status is 4xx, 5xx
-
+        
         # Cache the response
         with open(cache_file, 'wb') as f:
             pickle.dump(response.json(), f)
