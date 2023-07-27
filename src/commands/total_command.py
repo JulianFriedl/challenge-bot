@@ -32,9 +32,12 @@ class TotalCommand:
         current_date = datetime.date.today()
         current_year = current_date.year
         current_week = datetime.date.today().isocalendar()[1]
+        week_before_current_week = current_week - 1
 
-        start_date = datetime.date(current_year, 1, 1)
-        end_date = datetime.date(current_year, 12, 31)# TODO: change to last sunday (inclusive)
+        # get the start and end date by taking the first day in the challenge start week, and the last day of the week before the current week
+        start_date = datetime.date.fromisocalendar(current_year, CHALLENGE_START_WEEK, 1)
+        # end_date is exclusive in the Strava API so use the next day at 00:00:00 time
+        end_date = datetime.date.fromisocalendar(current_year, week_before_current_week, 7) + datetime.timedelta(days=1)
 
         start_date_seconds = time.mktime(start_date.timetuple())
         end_date_seconds = time.mktime(end_date.timetuple())
@@ -63,7 +66,7 @@ class TotalCommand:
 
             amount_to_pay = 0
 
-            for week in range(CHALLENGE_START_WEEK, current_week):
+            for week in range(CHALLENGE_START_WEEK, week_before_current_week+1): # plus 1 because in range isn't inclusive
                 points_in_week = week_command.WeekCommand(week).get_points(activities, username)
                 if points_in_week < (week_command.WeekCommand.POINTS_REQUIRED if week >= 9 else 2):
                     print(f"{username} has to pay in week {week} because they only earned {points_in_week} points.")
@@ -86,7 +89,8 @@ class TotalCommand:
         """
         activities = []
         page = 1
-        per_page = 30
+        PER_PAGE = 200
+        per_page = PER_PAGE
         end_of_results = False
 
         while not end_of_results:
@@ -109,15 +113,10 @@ class TotalCommand:
                 activities.extend(data)
 
                 page += 1
-
-                for activity in data:
-                    activity_date_str = activity["start_date_local"][:10]
-                    activity_date = datetime.date.fromisoformat(activity_date_str)
-
-                    if activity_date > end_date:
-                        end_of_results = True
-                        break
-
+            
+            #check if the response is smaller than the Per_page limit, meaning that all results were retrieved
+            if len(activities) < PER_PAGE:
+                end_of_results = True
         return activities, None
 
     def create_payment_embed(self, amounts: dict, year: int):

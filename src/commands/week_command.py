@@ -136,6 +136,7 @@ class WeekCommand:
         self.week = week
         self.year = datetime.date.today().year
         self.start_date = datetime.date.fromisocalendar(self.year, week, 1)
+        # end_date is exclusive in the strava API so use the next day at 00:00:00 time
         self.end_date = datetime.date.fromisocalendar(self.year, week, 7) + datetime.timedelta(days=1)
 
     def get_who_needs_to_pay(self):
@@ -159,7 +160,7 @@ class WeekCommand:
             return embed
 
         embed = discord.Embed(
-            title=f"Woche {self.week}. *({self.start_date} - {self.end_date})*",
+            title=f"Woche {self.week}. *({self.start_date} - {self.end_date - datetime.timedelta(days=1)})*",
             color=discord.Color.blue()
         )
         num_of_API_requests = 0

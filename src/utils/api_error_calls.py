@@ -12,6 +12,7 @@ import pickle
 import requests
 import discord
 from enum import Enum
+import datetime
 
 class API_CALL_TYPE(Enum):
     Cache = 1
@@ -60,6 +61,7 @@ def api_request(url, headers, params, username, user_id):
     if os.path.exists(cache_file):
         with open(cache_file, 'rb') as f:
             return pickle.load(f), None, API_CALL_TYPE.Cache
+        
 
     try:
         response = requests.get(url, headers=headers, params=params)
