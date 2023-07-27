@@ -11,8 +11,6 @@ There are two main ways to run blocking functions in a non-blocking way: using `
 
 ### Introduction
 
-In the realm of programming, especially with languages like Python, not all operations are instantaneous. Some tasks, like file I/O, network operations, or intensive computations, can take a considerable amount of time. This can be problematic in applications that need to remain responsive, such as web servers or chatbots. Enter asynchronous programming.
-
 Asynchronous programming allows certain parts of your code to yield control, permitting other tasks to run in the interim. Python’s `asyncio` library is a comprehensive solution for crafting asynchronous applications.
 
 ### `asyncio` in Detail
@@ -25,7 +23,7 @@ Asynchronous programming allows certain parts of your code to yield control, per
   
 - **Tasks**: A way to schedule multiple coroutines to run concurrently.
 
-#### How we used `asyncio` 
+#### How I used `asyncio` 
 
 Snippet from the code:
 ```python
@@ -37,7 +35,7 @@ async def total_command(interaction: discord.Interaction):
     embed_result = await loop.run_in_executor(None, TotalCommand().get_yearly_payments)
     await interaction.followup.send(embed=embed_result)
 ```
-In the Discord bot, I employed the `asyncio` library to prevent blocking operations from freezing the bot. Specifically, we used the `loop.run_in_executor` method. Here's a breakdown:
+In the Discord bot, I employed the `asyncio` library to prevent blocking operations from freezing the bot. Specifically, I used the `loop.run_in_executor` method. Here's a breakdown:
 
 1. **Initialize the Event Loop**:  
    `loop = asyncio.get_event_loop()`
