@@ -69,3 +69,37 @@ Flask works by using decorators to mark Python functions as endpoints for handli
 ### Waitress (Version: 2.0.0)
 
 Waitress is a pure Python WSGI server that can be used to serve Flask applications. It is easy to configure and supports Windows directly. It is easy to install as it does not require additional dependencies or compilation. However, it does not support streaming requests, and full request data is always buffered. It uses a single process with multiple thread workers.
+
+### Http Protocol
+
+The first line is the request line, which specifies the method, the path, and the HTTP version. The next lines are the header fields, which start with the name of the header, followed by a colon, a space, and the value of the header. The last line is an empty line, which indicates the end of the headers.
+
+To send this message to the server, you need to use a tool that can establish a TCP connection and transmit data over it. One such tool is netcat, which is a command-line utility that can read and write data across network connections. To use netcat to send the message, you can save the message in a file (e.g., request.txt) and then use the following command:
+
+`nc www.example.com 80 < request.txt`
+
+The `nc` command invokes netcat, followed by the hostname and the port number of the server (80 is the default port for HTTP). The `<` symbol redirects the input from the file to netcat. Netcat will then send the message to the server and display the response on the terminal.
+
+The response might look something like this:
+
+```
+HTTP/1.1 200 OK
+Date: Fri, 28 Jul 2023 10:20:18 GMT
+Server: Apache
+Last-Modified: Mon, 12 Oct 2020 14:28:20 GMT
+ETag: "2aa6-5b2cdea11a00f"
+Accept-Ranges: bytes
+Content-Length: 10918
+Vary: Accept-Encoding
+Content-Type: text/html
+
+<!doctype html>
+<html>
+<head>
+    <title>Example Domain</title>
+...
+</html>
+```
+
+The first line is the status line, which shows the HTTP version, the status code, and the status message. The next lines are the header fields, which provide information about the server, the resource, or the connection. The last part is the body of the response, which contains the content of the resource (in this case, an HTML document).
+
