@@ -1,7 +1,8 @@
 # Useful Links for the Project
 
 ## Making API Requests
-- [Python's requests library](https://docs.python.org/3/library/requests.html)
+- [Python's requests library](https://requests.readthedocs.io/en/latest/)
+- [Python request oauth2 workflow](https://requests-oauthlib.readthedocs.io/en/latest/oauth2_workflow.html)
 - [Python requests library tutorial](https://realpython.com/python-requests/)
 
 ## Discord Bots

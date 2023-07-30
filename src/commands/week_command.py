@@ -63,10 +63,10 @@ class Activity:
         This method extracts the necessary information from the activity data and sets the corresponding attributes.
         """
         self.type = activity_data["type"]
-        self.duration = activity_data["elapsed_time"] / 60
+        self.duration = activity_data["moving_time"] / 60
         self.date = datetime.datetime.strptime(activity_data["start_date_local"][:10], "%Y-%m-%d")
         self.start_date = datetime.datetime.strptime(activity_data["start_date_local"], "%Y-%m-%dT%H:%M:%SZ")
-        self.elapsed_time = datetime.timedelta(seconds=int(activity_data["elapsed_time"]))
+        self.elapsed_time = datetime.timedelta(seconds=int(activity_data["elapsed_time"]))# TODO: look at this again maybe I want to use moving time here instead of elapsed time
 
     def is_in_week(self, week):
         """
@@ -105,7 +105,7 @@ class Activity:
         if self.type in self.RULES_ACTIVITY and self.duration >= self.RULES_ACTIVITY[self.type] - self.SPAZI:
             walk_count = len([a for a in activities_done_set if a[0] == "Walk"])
             if walk_count >= self.WALKING_LIMIT and self.type == "Walk":
-                print(f"Did not add point for Walk because walk_count >= WALKING_LIMIT date: {self.date} type: {self.type}")
+                print(f"Did not add point for Walk because walk_count >= WALKING_LIMIT date: {self.start_date} type: {self.type}")
                 return points
             dates_done = {a[1] for a in activities_done_set}
             if self.date not in dates_done:
@@ -207,9 +207,9 @@ class WeekCommand:
                     points += 1
                     activities_done_set.add((activity.type, activity.date))
                     hit_counter = 0
-                    print(f"{username} Added 1 point for hit_counter being equal to HIT_REQUIRED, total points now: {points} Date: {activity.date} Type: {activity.type}")
+                    print(f"{username} Added 1 point for hit_counter being equal to {HIT_REQUIRED}, total points now: {points} Date: {activity.date} Type: {activity.type} Duration: {activity.duration}")
                 else:
                     points_from_activity = activity.calculate_points(activities_done_set)
                     points += points_from_activity
-                    print(f"{username} Added {points_from_activity} point/s from activity, total points now: {points} Date: {activity.start_date} Type: {activity.type}")
+                    print(f"{username} Added {points_from_activity} point/s from activity, total points now: {points} Date: {activity.start_date} Type: {activity.type} Duration: {activity.duration}")
         return points
