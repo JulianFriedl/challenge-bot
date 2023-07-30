@@ -16,7 +16,7 @@ RULES = {
         "Hike": 60,
         "Walk": 60,
         "Swim": 30,
-        "AlpineSki": 90,
+        "AlpineSki": 120,
         "RockClimbing": 60,
         "Workout": 60, #Hit workout, Teamsportarten die nicht auf Strava sind
         "Snowshoe": 60,
