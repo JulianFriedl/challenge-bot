@@ -80,26 +80,64 @@ To send this message to the server, you need to use a tool that can establish a 
 
 The `nc` command invokes netcat, followed by the hostname and the port number of the server (80 is the default port for HTTP). The `<` symbol redirects the input from the file to netcat. Netcat will then send the message to the server and display the response on the terminal.
 
+#### Example request
+
+The activities endpoint in the strava API allows you to get data about your own or another athlete's activities, such as id, name, type, distance, start date, etc. You can also use parameters to filter and sort the results. Here is an example of a GET request to the activities endpoint that fetches the summary representation of the current athlete's activities:
+
+```http
+GET /api/v3/athlete/activities HTTP/1.1
+Host: www.strava.com
+Authorization: Bearer [access_token]
+```
+
+The code block above shows how to format the request as code. The first line specifies the method (GET), the path (/api/v3/athlete/activities), and the protocol version (HTTP/1.1). The second line specifies the host name (www.strava.com). The third line specifies the authorization header with the access token that identifies the athlete and the application making the call.
+
+You can also add optional query parameters to the path, such as:
+
+- `before`: An epoch timestamp to use for filtering activities that have taken place before a certain time.
+- `after`: An epoch timestamp to use for filtering activities that have taken place after a certain time.
+- `page`: Page number. Defaults to 1.
+- `per_page`: Number of items per page. Defaults to 30.
+
+For example, if you want to get the first 10 activities of the current athlete that have taken place after January 1st, 2023, you can use the following path:
+
+```http
+/api/v3/athlete/activities?after=1640995200&page=1&per_page=10
+```
+
+The response from the server will be in JSON format and will contain an array of summary representations of the activities.
+
+#### Example Response 
+
 The response might look something like this:
 
 ```
 HTTP/1.1 200 OK
-Date: Fri, 28 Jul 2023 10:20:18 GMT
-Server: Apache
-Last-Modified: Mon, 12 Oct 2020 14:28:20 GMT
-ETag: "2aa6-5b2cdea11a00f"
-Accept-Ranges: bytes
-Content-Length: 10918
-Vary: Accept-Encoding
-Content-Type: text/html
+Date: Mon, 31 Jul 2023 10:44:38 GMT
+Server: Strava
+Content-Type: application/json; charset=utf-8
+Content-Length: 1234
 
-<!doctype html>
-<html>
-<head>
-    <title>Example Domain</title>
-...
-</html>
+[
+  {
+    "id": 123456789,
+    "name": "Morning Ride",
+    "type": "Ride",
+    "distance": 10000,
+    "start_date_local": "2023-07-31T08:00:00Z",
+    ...
+  },
+  {
+    "id": 987654321,
+    "name": "Evening Run",
+    "type": "Run",
+    "distance": 5000,
+    "start_date_local": "2023-07-30T18:00:00Z",
+    ...
+  },
+  ...
+]
 ```
 
-The first line is the status line, which shows the HTTP version, the status code, and the status message. The next lines are the header fields, which provide information about the server, the resource, or the connection. The last part is the body of the response, which contains the content of the resource (in this case, an HTML document).
+The first line is the status line, which shows the HTTP version, the status code, and the status message. The next lines are the header fields, which provide information about the server, the resource, or the connection. The last part is the body of the response, which contains the content of the resource (in this case, a JSON array of summary representations of the activities).
 
