@@ -21,7 +21,7 @@ RULES = {
         "Workout": 60, #Hit workout, Teamsportarten die nicht auf Strava sind
         "Snowshoe": 60,
         "VirtualRide": 60,
-        "Kayaking ": 60
+        "Kayaking": 60
 }
 
 SPAZI = 3 # tolerance in min
