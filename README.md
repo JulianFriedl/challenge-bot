@@ -1,5 +1,5 @@
 # challenge-bot
-A bot for discord, that connects to strava api and retrieves and evaluates certain data for an internal strava challenge between friends. It uses OAuth 2.0 to authenticate with the Strava API and obtain access tokens on behalf of the users. It also uses a Flask web server to handle the redirect from the Strava authorization page.
+A bot for discord, that connects to strava api and retrieves and evaluates certain data for a strava challenge between friends. It authenticates the Strava API access using Oauth2. After the user grants permission to the bot it uses a Flask web server to handle the redirect from the Strava authorization page and extracts the code.
 
 
 ## Requirements
@@ -37,4 +37,4 @@ https://discord.com/api/oauth2/authorize?client_id=YOUR_CLIENT_ID&permissions=20
 
 - To link your Strava account to the bot, send a `!strava_auth` command to the bot in a direct message. The bot will send you a link to the Strava authorization page, where you can grant permission for the bot to access your data.
 - After granting permission, you will be redirected back to the Flask web server, which will extract the authorization code from the request and pass it back to the bot.
-- The bot will exchange the authorization code for an access token and use it to make requests to the Strava API on your behalf. You can then use other commands to about the challenge.
+- The bot will exchange the authorization code for an access token and use it to make requests to the Strava API on your behalf. You can then use other commands that evaluate the registered users performance in the challenge.
