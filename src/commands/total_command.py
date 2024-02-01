@@ -148,7 +148,7 @@ class TotalCommand:
                 embed.add_field(name=username, value=f"muas {amount} euro für {year} zahlen.{emoji}", inline=False)
             else:
                 embed.add_field(name=username, value=f"muas nix für {year} zahlen.", inline=False)
-            embed.add_field(name="Api requests", value=f"{self.num_of_API_requests} requests to the strava API. {self.num_of_retrieve_Cache} retrieved from cache.\n", inline=False)
+        embed.add_field(name="Api requests", value=f"{self.num_of_API_requests} requests to the strava API. {self.num_of_retrieve_Cache} retrieved from cache.\n", inline=False)
 
 
         return embed
