@@ -28,5 +28,5 @@ JOKER = 1
 SPAZI = 3 # tolerance in min
 WALKING_LIMIT = 1 # maximum amount of points you can get from walking in a week
 HIT_REQUIRED = 2 # Required hit workouts for one point
-HIT_MIN_TIME = 10 # min time for a hit workout
+HIT_MIN_TIME = 15 # min time for a hit workout
 MIN_DURATION_MULTI_DAY = 360 # min duration you have to pass over midnight in order for a multiday activity to give you an extra point
