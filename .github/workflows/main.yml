@@ -15,7 +15,7 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
         script: |
-          cd /challenge-bot
+          cd ~/challenge-bot
           git pull
           sudo pkill -f bot_app.py
           pip install -r requirements.txt
