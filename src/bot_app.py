@@ -16,7 +16,7 @@ import asyncio
 import logging
 
 
-from flask_app import start_flask  # Consider renaming this to be snake_case
+from flask_app import start_flask 
 from commands.joker_command import JokerCommand
 from commands.help_command import help_embed
 from commands.strava_auth_command import strava_auth
