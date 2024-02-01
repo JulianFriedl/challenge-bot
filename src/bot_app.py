@@ -13,15 +13,23 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 import asyncio
+import logging
 
 
 from flask_app import start_flask  # Consider renaming this to be snake_case
+from commands.joker_command import JokerCommand
 from commands.help_command import help_embed
-import commands.strava_auth_command as StravaAuth
+from commands.strava_auth_command import strava_auth
 from commands.total_command import TotalCommand
 from commands.week_command import WeekCommand
+from config.log_config import setup_logging
 
 
+# Set up logging at the beginning of your script
+setup_logging()
+
+# Now you can use logging in this module
+logger = logging.getLogger(__name__)
 
 # Load environment variables from .env file
 load_dotenv()
@@ -41,8 +49,8 @@ async def on_ready():
     It starts up the Webserver that is used for retrieving Strava auth
     """
     await bot.tree.sync()
-    start_flask()
-    print(f'{bot.user} is now running!')
+    start_flask() 
+    logger.info(f'{bot.user} is now running!')
 
 
 @bot.tree.command(name = "help", description = "Displays every command and how to use it.")
@@ -56,8 +64,9 @@ async def help_command(interaction: discord.Interaction):
 @bot.tree.command(name = "strava_auth", description = "Initiates the Strava authorization process.")
 async def strava_auth_command(interaction: discord.Interaction):
     """Slash Command Implementation of the strava_auth_command"""
+    discord_user_id = interaction.user.id
     await interaction.response.defer(ephemeral=True)
-    await interaction.followup.send(embed=StravaAuth.strava_auth(), ephemeral= True)
+    await interaction.followup.send(embed=strava_auth(discord_user_id), ephemeral= True)
 
 @bot.tree.command(name="week", description="Returns the people who need to pay in the specified calendar week")
 @app_commands.describe(week_parameter='*Parameter:* Week (an integer in range 1-52)')
@@ -74,6 +83,15 @@ async def total_command(interaction: discord.Interaction):
     await interaction.response.defer()
     loop = asyncio.get_event_loop()
     embed_result = await loop.run_in_executor(None, TotalCommand().get_yearly_payments)
+    await interaction.followup.send(embed=embed_result)
+
+@bot.tree.command(name="joker", description="Allows you to skip a week.")
+async def joker_command(interaction: discord.Interaction):
+    """Slash Command Implementation of the joker_command"""
+    discord_user_id = interaction.user.id
+    await interaction.response.defer()
+    loop = asyncio.get_event_loop()
+    embed_result = await loop.run_in_executor(None, JokerCommand(str(discord_user_id)).joker)
     await interaction.followup.send(embed=embed_result)
 
 

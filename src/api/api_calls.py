@@ -12,7 +12,6 @@ import pickle
 import requests
 import discord
 from enum import Enum
-import datetime
 
 class API_CALL_TYPE(Enum):
     Cache = 1
@@ -24,7 +23,7 @@ BASE_PATH = os.path.dirname(SRC_PATH)
 CACHE_PATH = os.path.join(os.path.dirname(BASE_PATH), 'cache')
 os.makedirs(CACHE_PATH, exist_ok=True)  # make sure the directory exists
 
-def api_request(url, headers, params, username, user_id):
+def api_request(url:str, headers:dict, params:dict, username:str, user_id:str):
     """
     Makes a GET request to the specified URL and handles HTTP errors.
 

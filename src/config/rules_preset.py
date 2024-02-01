@@ -5,7 +5,7 @@ description: This module contains all the constants that are used by the bot com
 
 Author: Julian Friedl
 """
-CHALLENGE_START_WEEK = 5
+CHALLENGE_START_WEEK = 1
 PRICE_PER_WEEK = 5
 RULES = {
         "Ride": 60,
@@ -23,7 +23,8 @@ RULES = {
         "VirtualRide": 60,
         "Kayaking": 60
 }
-
+POINTS_REQUIRED = 3
+JOKER = 1
 SPAZI = 3 # tolerance in min
 WALKING_LIMIT = 2 # maximum amount of points you can get from walking in a week
 HIT_REQUIRED = 2 # Required hit workouts for one point

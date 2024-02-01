@@ -6,12 +6,21 @@ authorization codes from the Strava API and passes them to the Discord bot.
 
 Author: Julian Friedl
 """
-
+from traceback import format_exc
 from flask import Flask, request
 from waitress import serve
 import threading
+import logging
 
-import commands.strava_auth_command as StravaAuth
+from commands.strava_auth_command import exchange_code
+from config.log_config import setup_logging
+
+
+# Set up logging at the beginning of your script
+setup_logging()
+
+# Now you can use logging in this module
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
@@ -26,15 +35,15 @@ def strava_auth():
     """
     # Extract the authorization code from the request
     code = request.args.get('code')
-
+    discord_user_id = request.args.get('discord_id')
     if code:
         # Pass the authorization code to our Discord bot
         try:
-            StravaAuth.exchange_code(code)
+            exchange_code(code, discord_user_id)
             # Return a response to the user
             return 'Authorization successful! You can close this window.'
         except Exception as e:
-            print(e)
+            logger.error(f"An error occurred: {e}\n{format_exc()}")
             return 'An error occurred while processing the authorization. You can close this window.'
     else:
         return 'Authorization declined! You can close this window.'
