@@ -16,4 +16,4 @@ jobs:
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
         script: |
           cd ~/challenge-bot
-          sudo python3 src/bot_app.py > bot_app.log 2>&1
+          nohup sudo python3 src/bot_app.py &
