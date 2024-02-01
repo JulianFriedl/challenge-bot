@@ -17,7 +17,6 @@ jobs:
         script: |
           cd ~/challenge-bot
           git pull
-          PID=$(pgrep -f 'python3 src/bot_app.py')
-          if [ ! -z "$PID" ]; then sudo kill $PID; fi
-          sudo nohup python3 src/bot_app.py > bot_app.log 2>&1 &
-          sleep 5
+          sudo 
+          sudo pip install -r requirements.txt
+          sudo systemctl restart bot_app.service
