@@ -16,4 +16,5 @@ jobs:
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
         script: |
           cd ~/challenge-bot
+          git pull
           sudo nohup python3 src/bot_app.py &
