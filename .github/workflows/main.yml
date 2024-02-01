@@ -17,6 +17,10 @@ jobs:
         script: |
           cd ~/challenge-bot
           git pull
-          sudo 
-          sudo pip install -r requirements.txt
+          # Activate the virtual environment
+          source venv/bin/activate
+          # Install dependencies within the virtual environment
+          pip install -r requirements.txt
+          # Deactivate the virtual environment
+          deactivate
           sudo systemctl restart bot_app.service
