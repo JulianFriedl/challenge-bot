@@ -17,5 +17,7 @@ jobs:
         script: |
           cd ~/challenge-bot
           git pull
-          sudo pkill -f bot_app.py
+          PID=$(pgrep -f 'python3 src/bot_app.py')
+          if [ ! -z "$PID" ]; then sudo kill $PID; fi
           sudo nohup python3 src/bot_app.py > bot_app.log 2>&1 &
+          sleep 5
