@@ -13,11 +13,7 @@ import logging
 from config.rules_preset import *
 from config.log_config import setup_logging
 
-
-# Set up logging at the beginning of your script
 setup_logging()
-
-# Now you can use logging in this module
 logger = logging.getLogger(__name__)
 
 SRC_PATH = os.path.dirname(__file__)
@@ -33,6 +29,7 @@ def save_strava_credentials(response: json = None, discord_user_id: str = None):
     This function takes a JSON string containing user credentials, 
     checks if a file for the user already exists, and either appends to or overwrites the file.
     """
+    logger.info("Saving Credentials.")
     json_response = json.loads(response)
 
     athlete_constants = {

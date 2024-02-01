@@ -20,10 +20,7 @@ from config.rules_preset import CHALLENGE_START_WEEK
 from config.log_config import setup_logging
 
 
-# Set up logging at the beginning of your script
 setup_logging()
-
-# Now you can use logging in this module
 logger = logging.getLogger(__name__)
 
 class TotalCommand:

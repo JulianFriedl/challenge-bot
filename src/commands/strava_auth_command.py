@@ -17,10 +17,7 @@ import services.auth_data_controller as auth_data_controller
 from config.log_config import setup_logging
 
 
-# Set up logging at the beginning of your script
 setup_logging()
-
-# Now you can use logging in this module
 logger = logging.getLogger(__name__)
 
 load_dotenv()

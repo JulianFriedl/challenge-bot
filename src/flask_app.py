@@ -6,6 +6,8 @@ authorization codes from the Strava API and passes them to the Discord bot.
 
 Author: Julian Friedl
 """
+import os
+from dotenv import load_dotenv
 from traceback import format_exc
 from flask import Flask, request
 from waitress import serve
@@ -16,11 +18,11 @@ from commands.strava_auth_command import exchange_code
 from config.log_config import setup_logging
 
 
-# Set up logging at the beginning of your script
 setup_logging()
-
-# Now you can use logging in this module
 logger = logging.getLogger(__name__)
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -54,7 +56,7 @@ def run():
 
     This function starts the Flask app and listens for incoming requests on port 8000.
     """
-    serve(app, host='0.0.0.0', port=8000)
+    serve(app, host='0.0.0.0', port=os.getenv("PORT"))
 
 def start_flask():
     """

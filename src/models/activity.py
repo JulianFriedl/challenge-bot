@@ -12,11 +12,7 @@ import logging
 from models.athlete import Athlete
 from config.log_config import setup_logging
 
-
-# Set up logging at the beginning of your script
 setup_logging()
-
-# Now you can use logging in this module
 logger = logging.getLogger(__name__)
 
 

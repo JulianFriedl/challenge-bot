@@ -16,11 +16,7 @@ from models.athlete import Athlete
 from models.activity import Activity
 from config.log_config import setup_logging
 
-
-# Set up logging at the beginning of your script
 setup_logging()
-
-# Now you can use logging in this module
 logger = logging.getLogger(__name__)
 
 
