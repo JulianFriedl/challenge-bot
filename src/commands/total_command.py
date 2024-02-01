@@ -137,17 +137,18 @@ class TotalCommand:
         )
 
       
-        # Find the user with the highest amount
-        max_user = max(amounts, key=amounts.get)
+        # Find the maximum amount
+        max_amount = max(amounts.values())
+
         # Loop through the amounts and add fields to the embed
         for username, amount in amounts.items():
             if amount > 0:
-                # Check if the user is the max user and add a special emoji
-                emoji = "🤑" if username == max_user else ""
+                # Check if the amount is the max amount and add a special emoji
+                emoji = "🤑" if amount == max_amount else ""
                 embed.add_field(name=username, value=f"muas {amount} euro für {year} zahlen.{emoji}", inline=False)
             else:
-                embed.add_field(name=username, value=f"muas nix für {year} zahlen.💩", inline=False)
-        embed.add_field(name="Api requests", value=f"{self.num_of_API_requests} requests to the strava API. {self.num_of_retrieve_Cache} retrieved from cache.\n", inline=False)
+                embed.add_field(name=username, value=f"muas nix für {year} zahlen.", inline=False)
+                embed.add_field(name="Api requests", value=f"{self.num_of_API_requests} requests to the strava API. {self.num_of_retrieve_Cache} retrieved from cache.\n", inline=False)
 
 
         return embed
