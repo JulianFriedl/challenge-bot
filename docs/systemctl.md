@@ -23,8 +23,8 @@ This documentation provides instructions for setting up a Python application as 
     After=network.target
 
     [Service]
-    User=root
-    Group=root
+    User=your_user
+    Group=your_user
     WorkingDirectory=/path/to/your/application
     ExecStart=/usr/bin/python3(Alternatively to the python virtual env) /path/to/your/application/app.py
     Restart=always
@@ -63,6 +63,11 @@ This documentation provides instructions for setting up a Python application as 
     ```bash
     sudo systemctl status myapp.service
     ```
+    Use `-l` flag for output without truncation.
+    
+     ```bash
+    sudo systemctl -l status myapp.service
+    ```
 
 ### Step 3: Configure Permissions for Port 80 (Alternative to Running as root)
 Running services as `root` is not recommended for security reasons. To allow your application to bind to port 80 without root privileges, use the `setcap` command to grant specific capabilities to the Python interpreter:
@@ -73,7 +78,7 @@ Running services as `root` is not recommended for security reasons. To allow you
     sudo setcap 'cap_net_bind_service=+ep' /usr/bin/python3.9
     ```
 
-    Replace `/usr/bin/python3.9` with the path to your Python interpreter, which you can find with `which python3`.
+    Replace `/usr/bin/python3.9` with the path to your Python interpreter, which you can find with `which python3`. This is generally not recommended but I am too lazy to set up a reverse proxy.
 
 2. **Adjust Service File**: Change the `User` and `Group` in your service file to a non-root user and group, then reload and restart the service:
 
