@@ -55,17 +55,6 @@ Flask is a micro web framework written in Python. It is classified as a microfra
 
 Flask works by using decorators to mark Python functions as endpoints for handling HTTP requests sent by clients. These endpoints can return HTML pages, JSON data, or other types of content.
 
-### Best Practices for Developing Flask Apps
-
-1. Use a secret key to secure your app.
-2. Don’t use Flask’s development server in production.
-3. Configure logging properly.
-4. Use Blueprints to organize your application.
-5. Use an ORM (e.g. SQLAlchemy) to interact with your database.
-6. Use a proper database migration tool (e.g. Alembic) to manage schema changes.
-7. Test your code thoroughly.
-8. Make sure you know how to scale your app.
-
 ### Waitress (Version: 2.0.0)
 
 Waitress is a pure Python WSGI server that can be used to serve Flask applications. It is easy to configure and supports Windows directly. It is easy to install as it does not require additional dependencies or compilation. However, it does not support streaming requests, and full request data is always buffered. It uses a single process with multiple thread workers.
