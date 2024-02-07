@@ -94,8 +94,11 @@ class TotalCommand:
         # Find the maximum amount
         max_amount = max(amounts.values())
 
+        # Sort amounts by value in descending order
+        sorted_amounts = sorted(amounts.items(), key=lambda item: item[1], reverse=True)
+
         # Loop through the amounts and add fields to the embed
-        for username, amount in amounts.items():
+        for username, amount in sorted_amounts:
             if amount > 0:
                 # Check if the amount is the max amount and add a special emoji
                 emoji = "🤑" if amount == max_amount else ""

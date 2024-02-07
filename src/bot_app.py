@@ -103,7 +103,7 @@ async def week_command(interaction: discord.Interaction, week_parameter:app_comm
     """Slash Command Implementation of the week_command"""
     await interaction.response.defer()
     loop = asyncio.get_event_loop()
-    embed_result = await loop.run_in_executor(None, WeekCommand(week_parameter).get_who_needs_to_pay)
+    embed_result = await loop.run_in_executor(None, WeekCommand(week_parameter).excecute_week_command)
     await interaction.followup.send(embed=embed_result)
 
 @bot.tree.command(name="total", description="Returns all challenge members and the amount they have to pay.")

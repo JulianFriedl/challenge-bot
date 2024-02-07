@@ -39,7 +39,7 @@ class WeekCommand:
         self.num_of_API_requests = 0
         self.num_of_retrieve_Cache = 0
 
-    def get_who_needs_to_pay(self):
+    def excecute_week_command(self):
         """
         Returns an embed message with the athletes who need to pay for the week.
 
@@ -64,25 +64,61 @@ class WeekCommand:
             color=discord.Color.blue()
         )
 
+        # Initialize a list to hold athlete data and points
+        athlete_data = []
+
+        # Collect data and points for each athlete
         for cred in loaded_creds:
             athlete = Athlete(cred)
-            activities, num_of_API_requests, num_of_retrieve_Cache = athlete.fetch_athlete_activities(
-                self.start_date, self.end_date)
+            activities, num_of_API_requests, num_of_retrieve_Cache = athlete.fetch_athlete_activities(self.start_date, self.end_date)
             points = self.get_points(activities, athlete)
             self.num_of_API_requests += num_of_API_requests
             self.num_of_retrieve_Cache += num_of_retrieve_Cache
-            if self.week in athlete.joker_weeks:
-                embed.add_field(
-                    name=athlete.username, value=f"Muas net zoin JOKER! {points}/{athlete.points_required}  Punkt/e.🃏\n", inline=False)
-            elif points < (athlete.points_required):
-                embed.add_field(
-                    name=athlete.username, value=f"Muas {athlete.price_per_week*self.get_price_multiplier(athlete)}€ zoin! {points}/{athlete.points_required} Punkt/e.❌\n", inline=False)
-            else:
-                embed.add_field(
-                    name=athlete.username, value=f"Muas net zoin! {points}/{athlete.points_required} Punkt/e.✅\n", inline=False)
 
-        embed.add_field(
-            name="Api requests", value=f"{self.num_of_API_requests} requests to the strava API. {self.num_of_retrieve_Cache} retrieved from cache.\n", inline=False)
+            # Calculate the amount if required
+            amount = athlete.price_per_week * self.get_price_multiplier(athlete) if points < athlete.points_required else 0
+
+            # Append athlete data including calculated amount or flag for Joker status
+            athlete_data.append((athlete.username, points, athlete.points_required, amount, self.week in athlete.joker_weeks))
+
+        # Sort the list by points in descending order
+        sorted_athlete_data = sorted(athlete_data, key=lambda x: x[1], reverse=True)
+
+        # Initialize variables to track previous points and adjusted placement
+        previous_points = None
+        adjusted_placement = 0
+        actual_placement = 0  # This counts the actual number of iterations
+
+        # Loop through the sorted list to add fields to the embed, handling ties
+        for username, points, points_required, amount, is_joker in sorted_athlete_data:
+            actual_placement += 1
+            # Check if the current points are different from the previous points to adjust placement for ties
+            if points != previous_points:
+                adjusted_placement = actual_placement
+            previous_points = points
+
+            # Determine placement and assign corresponding emoji based on adjusted placement
+            placement_emoji = ""
+            if adjusted_placement == 1:  # First place
+                placement_emoji = "🥇"
+            elif adjusted_placement == 2:  # Second place
+                placement_emoji = "🥈"
+            elif adjusted_placement == 3:  # Third place
+                placement_emoji = "🥉"
+
+            # Construct the value string based on athlete's status
+            if is_joker:
+                value = f"{placement_emoji}Muas net zoin JOKER! {points}/{points_required} Punkt/e.🃏\n"
+            elif points < points_required:
+                value = f"{placement_emoji}Muas {amount}€ zoin! {points}/{points_required} Punkt/e.❌\n"
+            else:
+                value = f"{placement_emoji}Muas net zoin! {points}/{points_required} Punkt/e.✅\n"
+            
+            # Add the field to the embed with the athlete's information
+            embed.add_field(name=username, value=value, inline=False)
+
+        # Add API request information
+        embed.add_field(name="Api requests", value=f"{self.num_of_API_requests} requests to the strava API. {self.num_of_retrieve_Cache} retrieved from cache.\n", inline=False)
 
         return embed
 
