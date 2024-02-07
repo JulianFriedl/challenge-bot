@@ -69,8 +69,8 @@ class WeekCommand:
             activities, num_of_API_requests, num_of_retrieve_Cache = athlete.fetch_athlete_activities(
                 self.start_date, self.end_date)
             points = self.get_points(activities, athlete)
-            self.num_of_API_requests = num_of_API_requests
-            self.num_of_retrieve_Cache = num_of_retrieve_Cache
+            self.num_of_API_requests += num_of_API_requests
+            self.num_of_retrieve_Cache += num_of_retrieve_Cache
             if self.week in athlete.joker_weeks:
                 embed.add_field(
                     name=athlete.username, value=f"Muas net zoin JOKER! {points}/{athlete.points_required}  Punkt/e.🃏\n", inline=False)
