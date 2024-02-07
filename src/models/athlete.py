@@ -13,7 +13,7 @@ import json
 
 import services.auth_refresh as auth_refresh
 import services.auth_data_controller as auth_data_controller
-from api.api_calls import api_request
+from api.api_calls import api_request, API_CALL_TYPE
 
 
 class Athlete:
@@ -41,21 +41,51 @@ class Athlete:
         
         self.joker = self.credentials.get('vars', {}).get('joker', 0)
         self.joker_weeks = self.credentials.get('vars', {}).get('joker_weeks', [])
+        self.week_results = self.credentials.get('vars', {}).get('week_results', [])
 
         self.discord_id = self.credentials.get('discord_id', 0)
 
         auth_data_controller.save_strava_credentials(json.dumps(self.credentials))
 
-    def fetch_activities(self, start_date : datetime, end_date : datetime):
+    def fetch_athlete_activities(self, start_date : datetime, end_date : datetime):
         """
-        Fetches the activities for the athlete within the specified date range.
+        Fetch all the activities in a year. The api can send a max of 200 Activities per request. 
+        By iterating over the page parameter until I either get an error or the returned data is null,
+        I get all the activities and append them to a list.
 
-        This method makes an API call to retrieve the activities for the athlete within the specified date range.
-        It returns a tuple with the JSON response if the API call is successful, and an error embed if an error occurred.
+        Returns:
+        activities (list of activities)
+        error_embed (discord.Embed or None): None if the request was successful, otherwise a Discord embed with the error message.
+        
         """
         start_date_seconds = time.mktime(start_date.timetuple())
         end_date_seconds = time.mktime(end_date.timetuple())
-        headers = {"Authorization": f"Bearer {self.access_token}"}
-        params = {"before": end_date_seconds, "after": start_date_seconds}
-        response, error_embed, api_call_type  = api_request("https://www.strava.com/api/v3/athlete/activities", headers, params, self.username, self.user_id)
-        return (response, error_embed, api_call_type)
+        activities = []
+        page = 1
+        PER_PAGE = 200
+        per_page = PER_PAGE
+        end_of_results = False
+
+        num_of_API_requests = 0
+        num_of_retrieve_Cache = 0
+        while not end_of_results:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            params = {"before": end_date_seconds, "after": start_date_seconds, "page": page, "per_page": per_page}
+
+            data, api_call_type = api_request("https://www.strava.com/api/v3/athlete/activities", headers, params, self.username, self.user_id)
+            if api_call_type == API_CALL_TYPE.API:
+                num_of_API_requests += 1
+            elif api_call_type == API_CALL_TYPE.Cache:
+                num_of_retrieve_Cache += 1
+
+            if not data:
+                end_of_results = True
+            else:
+                activities.extend(data)
+
+                page += 1
+            
+            #check if the response is smaller than the Per_page limit, meaning that all results were retrieved
+            if len(activities) < PER_PAGE:
+                end_of_results = True
+        return (data, num_of_API_requests, num_of_retrieve_Cache)

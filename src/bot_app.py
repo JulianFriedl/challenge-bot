@@ -14,8 +14,9 @@ from discord.ext import commands
 from discord import app_commands
 import asyncio
 import logging
+import traceback 
 
-
+from api.custom_api_error import CustomAPIError
 from flask_app import start_flask 
 from commands.joker_command import JokerCommand
 from commands.help_command import help_embed
@@ -48,6 +49,37 @@ async def on_ready():
     await bot.tree.sync()
     start_flask() 
     logger.info(f'{bot.user} is now running!')
+
+
+@bot.tree.error
+async def on_application_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
+    """Global error handler for application commands."""
+    # Assuming logger is already defined and configured
+    error_traceback = traceback.format_exception(type(error), error, error.__traceback__)
+    # Initialize error_embed outside the if-else scope
+    error_embed = None
+    
+    # Customize error message or embed based on the exception type
+    if isinstance(error.original, CustomAPIError):
+        # Directly use the embed from the CustomAPIError
+        logger.error(f"An error occurred: {error}")
+        error_embed = error.original.embed
+    else:
+        # Handle other errors
+        logger.error(f"An error occurred: {error_traceback}")
+        message = "An internal error occurred."
+        error_embed = discord.Embed(title="Internal Error", description=message, color=discord.Color.red())
+
+    # Ensure error_embed is not None before attempting to send it
+    if error_embed:
+        # Check if the interaction has been responded to
+        if interaction.response.is_done():
+            # Use followup.send when the initial response has been made
+            await interaction.followup.send(embed=error_embed, ephemeral=True)
+        else:
+            # Use response.send_message for the initial response
+            await interaction.response.send_message(embed=error_embed, ephemeral=True)
+
 
 
 @bot.tree.command(name = "help", description = "Displays every command and how to use it.")

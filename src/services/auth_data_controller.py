@@ -47,8 +47,7 @@ def save_strava_credentials(response: json = None, discord_user_id: str = None):
     athlete_vars = {
         "joker": JOKER,
         "joker_weeks": [],
-        "weeks_checked": [],
-        "price_multiplier": 1
+        "week_results": []
     }
 
     credentials = {}

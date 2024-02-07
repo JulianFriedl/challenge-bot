@@ -13,6 +13,7 @@ import requests
 import discord
 from enum import Enum
 
+from api.custom_api_error import CustomAPIError
 class API_CALL_TYPE(Enum):
     Cache = 1
     API = 2
@@ -40,7 +41,6 @@ def api_request(url:str, headers:dict, params:dict, username:str, user_id:str):
 
     Returns:
         response (dict or None): The JSON response if the request was successful, otherwise None.
-        error_embed (discord.Embed or None): None if the request was successful, otherwise a Discord embed with the error message.
         API_CALL_TYPE (Cache = 1 API = 2, Error = 3): Cache if the cache is used and API if the api is used and Error if error occurs
     """
     #check if the cache dir exists
@@ -59,7 +59,7 @@ def api_request(url:str, headers:dict, params:dict, username:str, user_id:str):
     # If the cache file exists, load the cached response
     if os.path.exists(cache_file):
         with open(cache_file, 'rb') as f:
-            return pickle.load(f), None, API_CALL_TYPE.Cache
+            return pickle.load(f), API_CALL_TYPE.Cache
         
 
     try:
@@ -70,7 +70,7 @@ def api_request(url:str, headers:dict, params:dict, username:str, user_id:str):
         with open(cache_file, 'wb') as f:
             pickle.dump(response.json(), f)
 
-        return response.json(), None, API_CALL_TYPE.API
+        return response.json(), API_CALL_TYPE.API
     except requests.exceptions.HTTPError as e:
         status_code = response.status_code
 
@@ -91,8 +91,8 @@ def api_request(url:str, headers:dict, params:dict, username:str, user_id:str):
             message = f"An error occurred while making the API request for user {username}. Status code: {status_code}"
 
         error_embed = discord.Embed(title="HTTP Error", description=message, color=discord.Color.red())
-        return None, error_embed, API_CALL_TYPE.Error
+        raise CustomAPIError(message, error_embed) from e
     except requests.exceptions.RequestException as e:
         message = f"An error occurred while making the API request for user {username}: {str(e)}"
         error_embed = discord.Embed(title="Request Error", description=message, color=discord.Color.red())
-        return None, error_embed, API_CALL_TYPE.Error
+        raise CustomAPIError(message, error_embed) from e

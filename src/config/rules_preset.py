@@ -23,6 +23,8 @@ RULES = {
         "VirtualRide": 60,
         "Kayaking": 60
 }
+MULTIPLIER = 2 #the Amount that the Price gets multiplied for every missed week
+MULTIPLIER_ON = True #Switch to toggle the multiplier on and off
 POINTS_REQUIRED = 3
 JOKER = 1
 SPAZI = 3 # tolerance in min

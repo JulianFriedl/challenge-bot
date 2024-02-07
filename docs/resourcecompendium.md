@@ -14,7 +14,7 @@
 - [Discord.py App_commands Example 2](https://github.com/Rapptz/discord.py/blob/master/examples/app_commands/transformers.py)
 - [Discord bot intents - Doku](https://docs.pycord.dev/en/master/intents.html#privileged-intents): Explains the intents that are required for the api
 - [Discord bot intents - Problem-case](https://stackoverflow.com/questions/70920148/pycord-message-content-is-empty): A problem case that I had with the intents
-
+- [Slash Command Error Handling](https://fallendeity.github.io/discord.py-masterclass/slash-commands/#error-handling-and-checks): A good resource for anything related discord.py
 ## Strava Api
 - [Redirect Uri](https://github.com/ethanopp/fitly/issues/12) : I had problems with setting the correct redirect uri in strava, this issue explains it.
 - [Strava Api Docu](https://developers.strava.com/docs/reference/): The docu of all the endpoints.

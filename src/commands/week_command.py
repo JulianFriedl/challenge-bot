@@ -10,11 +10,13 @@ import datetime
 import discord
 import logging
 
+from config.rules_preset import MULTIPLIER, MULTIPLIER_ON
 import services.auth_data_controller as auth_data_controller
 from api.api_calls import API_CALL_TYPE
 from models.athlete import Athlete
 from models.activity import Activity
 from config.log_config import setup_logging
+from services.auth_data_controller import update_athlete_vars
 
 setup_logging()
 logger = logging.getLogger(__name__)
@@ -32,7 +34,10 @@ class WeekCommand:
         self.year = datetime.date.today().year
         self.start_date = datetime.date.fromisocalendar(self.year, week, 1)
         # end_date is exclusive in the strava API so use the next day at 00:00:00 time
-        self.end_date = datetime.date.fromisocalendar(self.year, week, 7) + datetime.timedelta(days=1)
+        self.end_date = datetime.date.fromisocalendar(
+            self.year, week, 7) + datetime.timedelta(days=1)
+        self.num_of_API_requests = 0
+        self.num_of_retrieve_Cache = 0
 
     def get_who_needs_to_pay(self):
         """
@@ -58,28 +63,24 @@ class WeekCommand:
             title=f"Woche {self.week}. *({self.start_date} - {self.end_date - datetime.timedelta(days=1)})*",
             color=discord.Color.blue()
         )
-        num_of_API_requests = 0
-        num_of_retrieve_Cache = 0
+
         for cred in loaded_creds:
             athlete = Athlete(cred)
-            result, error_embed, api_call_type = athlete.fetch_activities(self.start_date, self.end_date)
-            if api_call_type == API_CALL_TYPE.API:
-                num_of_API_requests += 1
-            elif api_call_type == API_CALL_TYPE.Cache:
-                num_of_retrieve_Cache += 1
-            if api_call_type == API_CALL_TYPE.Error:
-                return error_embed
-            else:
-                activities = result
+            activities, self.num_of_API_requests, self.num_of_retrieve_Cache = athlete.fetch_athlete_activities(
+                self.start_date, self.end_date)
             points = self.get_points(activities, athlete)
             if self.week in athlete.joker_weeks:
-                embed.add_field(name=athlete.username, value=f"Muas net zoin JOKER! {points}/{athlete.points_required}  Punkt/e.🃏\n", inline=False)
+                embed.add_field(
+                    name=athlete.username, value=f"Muas net zoin JOKER! {points}/{athlete.points_required}  Punkt/e.🃏\n", inline=False)
             elif points < (athlete.points_required):
-                embed.add_field(name=athlete.username, value=f"Muas zoin! {points}/{athlete.points_required} Punkt/e.❌\n", inline=False)
+                embed.add_field(
+                    name=athlete.username, value=f"Muas {athlete.price_per_week*self.get_price_multiplier(athlete)}€ zoin! {points}/{athlete.points_required} Punkt/e.❌\n", inline=False)
             else:
-                embed.add_field(name=athlete.username, value=f"Muas net zoin! {points}/{athlete.points_required} Punkt/e.✅\n", inline=False)
-        
-        embed.add_field(name="Api requests", value=f"{num_of_API_requests} requests to the strava API. {num_of_retrieve_Cache} retrieved from cache.\n", inline=False)
+                embed.add_field(
+                    name=athlete.username, value=f"Muas net zoin! {points}/{athlete.points_required} Punkt/e.✅\n", inline=False)
+
+        embed.add_field(
+            name="Api requests", value=f"{self.num_of_API_requests} requests to the strava API. {self.num_of_retrieve_Cache} retrieved from cache.\n", inline=False)
 
         return embed
 
@@ -95,24 +96,139 @@ class WeekCommand:
         points = 0
         hit_counter = 0
         activities_done_set = set()
-        #reverse it because strava orders the most recent one on top
+        # reverse it because strava orders the most recent one on top
         for activity_data in reversed(activities):
             activity = Activity(activity_data)
             if activity.is_in_week(self.week):
-                hit_counter = activity.count_hit_workouts(hit_counter, activities_done_set, athlete)
+                hit_counter = activity.count_hit_workouts(
+                    hit_counter, activities_done_set, athlete)
                 if hit_counter == athlete.hit_required:
                     points += 1
                     activities_done_set.add((activity.type, activity.date))
                     hit_counter = 0
                     logger.debug(
-                    f"{athlete.username} Added 1 point for hit_counter: {hit_counter}\n"
-                    f"Total points now: {points}\n"
-                    f"Date: {activity.date}, Type: {activity.type}, Duration: {activity.duration}")
+                        f"{athlete.username} Added 1 point for hit_counter: {hit_counter}\n"
+                        f"Total points now: {points}\n"
+                        f"Date: {activity.date}, Type: {activity.type}, Duration: {activity.duration}")
                 else:
-                    points_from_activity = activity.calculate_points(activities_done_set, athlete)
+                    points_from_activity = activity.calculate_points(
+                        activities_done_set, athlete)
                     points += points_from_activity
                     logger.debug(
-                    f"{athlete.username} Added {points_from_activity} point/s from activity\n"
-                    f"Total points now: {points}\n"
-                    f"Date: {activity.start_date}, Type: {activity.type}, Duration: {activity.duration}")
+                        f"{athlete.username} Added {points_from_activity} point/s from activity\n"
+                        f"Total points now: {points}\n"
+                        f"Date: {activity.start_date}, Type: {activity.type}, Duration: {activity.duration}")
+        
+        # Insert week into week_results
+        existing_weeks = set(int(week_result.split("_")[0]) for week_result in athlete.week_results)
+
+        if self.week not in existing_weeks:
+            # Week does not exist, insert new result
+            insert_pos = self.week - 1  # Assuming week numbers are 1-based and list is 0-based
+            if self.week in athlete.joker_weeks:
+                athlete.week_results.insert(insert_pos, f"{self.week}_2")
+            elif points < athlete.points_required:
+                athlete.week_results.insert(insert_pos, f"{self.week}_0")
+            else:
+                athlete.week_results.insert(insert_pos, f"{self.week}_1")
+        else:
+            # Week exists, replace the result
+            for i, week_result in enumerate(athlete.week_results):
+                week_num = int(week_result.split("_")[0])
+                if week_num == self.week:
+                    if self.week in athlete.joker_weeks:
+                        athlete.week_results[i] = f"{self.week}_2"
+                    elif points < athlete.points_required:
+                        athlete.week_results[i] = f"{self.week}_0"
+                    else:
+                        athlete.week_results[i] = f"{self.week}_1"
+                    break  # Exit the loop once the week is found and updated
+
+        # Update athlete credentials with the new week results
+        athlete.credentials["vars"]["week_results"] = athlete.week_results
+
+        # Call the function to update the athlete's vars in storage or database
+        update_athlete_vars(athlete.credentials)
+
         return points
+
+    def get_price_multiplier(self, athlete: Athlete):
+        """
+        Calculates the price multiplier for an athlete based on the number of weeks missed.
+    
+        Parameters:
+        - athlete (Athlete): The athlete object containing week results and other relevant data.
+
+        Returns:
+        - float: The calculated multiplier, which is a constant MULTIPLIER raised to the power of missed weeks count.
+        """
+        if not MULTIPLIER_ON:
+            return 1
+        
+        self.get_missing_weeks(athlete)#get any weeks that are missing for the calculation
+        missed_weeks_count = 0
+        for week_result in reversed(athlete.week_results):
+            week = int(week_result.split("_")[0])
+            result = int(week_result.split("_")[1])
+            if week >= self.week:
+                continue
+            if result == 1:
+                break
+            elif result == 0:
+                missed_weeks_count += 1
+            elif result == 2:  # joker
+                continue
+        
+        return MULTIPLIER**(missed_weeks_count)
+
+    def get_missing_weeks(self, athlete: Athlete):
+        """
+        Identifies missing weeks in an athlete's performance records up to the current week and makes an API request
+        to fetch activities for those weeks if any are missing.
+
+        Parameters:
+        - athlete (Athlete): The athlete object whose week results are to be analyzed.
+
+        Returns:
+        - None: This function does not return a value but updates the athlete's records with fetched activities for missing weeks.
+        """
+        
+        # check if past weeks data is complete for the price multiplier calculation
+        weeks_missing = []
+        week_number = self.week
+
+        # Parse the week results into a dictionary {week: result}
+        week_results_dict = {int(result.split("_")[0]): int(result.split("_")[1]) for result in athlete.week_results}
+
+        # If all results are 1 or there are no results, no missing weeks are considered
+        if week_results_dict.get(self.week-1) == 1:
+            return
+
+        # Iterate through all weeks from 1 to the current week
+        for week in reversed(range(1, week_number + 1)):
+            if week not in week_results_dict.keys():
+                weeks_missing.append(week)
+        if weeks_missing != []:
+            self.missing_weeks_api_request(weeks_missing, athlete)
+
+    def missing_weeks_api_request(self, weeks_missing: list, athlete: Athlete):
+        """
+        Performs an API request to retrieve activities for a range of missing weeks for the given athlete.
+
+        Parameters:
+        - weeks_missing (list): A list of integers representing the missing weeks for which activities need to be fetched.
+        - athlete (Athlete): The athlete object for whom activities are being fetched.
+
+        Returns:
+        - None: This function does not return a value but updates the athlete's records with the fetched activities.
+        """
+        start_date = datetime.date.fromisocalendar(self.year, weeks_missing[len(weeks_missing)-1], 1)
+        # end_date is exclusive in the strava API so use the next day at 00:00:00 time
+        end_date = datetime.date.fromisocalendar(
+            self.year, weeks_missing[0], 7) + datetime.timedelta(days=1)
+        activities, num_of_API_requests, num_of_retrieve_Cache  = athlete.fetch_athlete_activities(start_date, end_date)
+        self.num_of_API_requests += num_of_API_requests
+        self.num_of_retrieve_Cache += num_of_retrieve_Cache
+
+        for week in range(weeks_missing[len(weeks_missing)-1], weeks_missing[0]+1): # plus 1 because in range isn't inclusive
+            WeekCommand(week).get_points(activities, athlete)
