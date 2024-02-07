@@ -55,8 +55,9 @@ class TotalCommand:
 
         for cred in loaded_creds:
             athlete = Athlete(cred)
-            activities, self.num_of_API_requests, self.num_of_retrieve_Cache = athlete.fetch_athlete_activities(start_date, end_date)
-
+            activities, num_of_API_requests, num_of_retrieve_Cache = athlete.fetch_athlete_activities(start_date, end_date)
+            self.num_of_API_requests += num_of_API_requests
+            self.num_of_retrieve_Cache += num_of_retrieve_Cache
             amount_to_pay = 0
             price_multiplier = 0 #used for tracking how much the price has to be multiplied based on missed weeks
             for week in range(CHALLENGE_START_WEEK, week_before_current_week+1): # plus 1 because in range isn't inclusive
