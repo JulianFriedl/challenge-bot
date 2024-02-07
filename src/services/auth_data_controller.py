@@ -12,6 +12,10 @@ import logging
 
 from config.rules_preset import *
 from config.log_config import setup_logging
+from threading import Lock
+
+file_lock = Lock()
+
 
 setup_logging()
 logger = logging.getLogger(__name__)
@@ -29,61 +33,63 @@ def save_strava_credentials(response: json = None, discord_user_id: str = None):
     This function takes a JSON string containing user credentials, 
     checks if a file for the user already exists, and either appends to or overwrites the file.
     """
-    logger.info("Saving Credentials.")
-    json_response = json.loads(response)
+    with file_lock:
+        logger.info("Saving Credentials.")
+        json_response = json.loads(response)
 
-    athlete_constants = {
-        "rules": RULES,
-        "points_required": POINTS_REQUIRED,
-        "price_per_week": PRICE_PER_WEEK,
-        "spazi": SPAZI,
-        "walking_limit": WALKING_LIMIT,
-        "hit_required": HIT_REQUIRED,
-        "hit_min_time": HIT_MIN_TIME,
-        "min_duration_multi_day": MIN_DURATION_MULTI_DAY,
-        "start_week": CHALLENGE_START_WEEK,
-    }
+        athlete_constants = {
+            "rules": RULES,
+            "points_required": POINTS_REQUIRED,
+            "price_per_week": PRICE_PER_WEEK,
+            "spazi": SPAZI,
+            "walking_limit": WALKING_LIMIT,
+            "hit_required": HIT_REQUIRED,
+            "hit_min_time": HIT_MIN_TIME,
+            "min_duration_multi_day": MIN_DURATION_MULTI_DAY,
+            "start_week": CHALLENGE_START_WEEK,
+        }
 
-    athlete_vars = {
-        "joker": JOKER,
-        "joker_weeks": [],
-        "week_results": []
-    }
+        athlete_vars = {
+            "joker": JOKER,
+            "joker_weeks": [],
+            "week_results": []
+        }
 
-    credentials = {}
-    if 'strava_data' in json_response:
-        credentials['strava_data'] = json_response['strava_data']
-    else:
-        credentials['strava_data'] = json_response
-    credentials['constants'] = athlete_constants
-    credentials['vars'] = athlete_vars
-    credentials['discord_user_id'] = discord_user_id
+        credentials = {}
+        if 'strava_data' in json_response:
+            credentials['strava_data'] = json_response['strava_data']
+        else:
+            credentials['strava_data'] = json_response
+        credentials['constants'] = athlete_constants
+        credentials['vars'] = athlete_vars
+        credentials['discord_user_id'] = discord_user_id
 
-    data = load_or_create_data_dir()
+        data = load_or_create_data_dir()
 
-    # Update or append the new credentials
-    for existing_cred in data:
-        if existing_cred['strava_data']['athlete']['id'] == credentials['strava_data']['athlete']['id']:
-            existing_cred['strava_data'] = credentials['strava_data']
-            if credentials['discord_user_id']:
-                existing_cred['discord_user_id'] = credentials['discord_user_id']
-            break
-    else:
-        data.append(credentials)
+        # Update or append the new credentials
+        for existing_cred in data:
+            if existing_cred['strava_data']['athlete']['id'] == credentials['strava_data']['athlete']['id']:
+                existing_cred['strava_data'] = credentials['strava_data']
+                if credentials['discord_user_id']:
+                    existing_cred['discord_user_id'] = credentials['discord_user_id']
+                break
+        else:
+            data.append(credentials)
 
-    with open(FILENAME, 'w') as f:
-        json.dump(data, f, default=serialize, indent=4)
+        with open(FILENAME, 'w') as f:
+            json.dump(data, f, default=serialize, indent=4)
 
 
 def update_athlete_vars(credentials: dict):
-    data = load_or_create_data_dir()
-    for existing_cred in data:
-        if existing_cred['strava_data']['athlete']['id'] == credentials['strava_data']['athlete']['id']:
-            if credentials['vars']:
-                existing_cred['vars'] = credentials['vars']
-            break
-    with open(FILENAME, 'w') as f:
-        json.dump(data, f, default=serialize, indent=4)
+    with file_lock:
+        data = load_or_create_data_dir()
+        for existing_cred in data:
+            if existing_cred['strava_data']['athlete']['id'] == credentials['strava_data']['athlete']['id']:
+                if credentials['vars']:
+                    existing_cred['vars'] = credentials['vars']
+                break
+        with open(FILENAME, 'w') as f:
+            json.dump(data, f, default=serialize, indent=4)
 
 
 def load_or_create_data_dir():
@@ -107,11 +113,12 @@ def load_credentials():
 
     This function checks if a file with user credentials exists, and if so, loads and returns the credentials.
     """
-    if os.path.exists(FILENAME) and os.path.getsize(FILENAME) != 0:
-        with open(FILENAME, 'r') as f:
-            credentials = json.load(f)
-        return credentials
-    return None
+    with file_lock:
+        if os.path.exists(FILENAME) and os.path.getsize(FILENAME) != 0:
+            with open(FILENAME, 'r') as f:
+                credentials = json.load(f)
+            return credentials
+        return None
 
 
 def serialize(obj):

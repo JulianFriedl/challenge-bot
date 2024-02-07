@@ -99,3 +99,30 @@ result = await loop.run_in_executor(None, blocking_function, arg1, arg2)
 
 This runs `blocking_function` in a separate thread (because we used the default executor), allowing the bot to handle other events while `blocking_function` is processing.
 
+### Why and How We Use Locking
+
+In our application, multiple commands may attempt to read from or write to a shared JSON file concurrently. Without proper synchronization, this could lead to race conditions, where the outcome of operations depends on the non-deterministic timing of events, potentially causing data corruption or loss.
+
+To prevent such race conditions and ensure data integrity, we employ locking mechanisms. Locking ensures that only one operation can access the shared resource (in this case, the JSON file) at a time, serializing access to critical sections of the code that modify the file.
+
+#### Synchronous Locking with `threading.Lock`
+
+For operations that are executed in a synchronous context or within executor threads (via `loop.run_in_executor`), we use `threading.Lock`. This standard lock from the `threading` module is suitable for managing access to shared resources in a multi-threaded environment, where blocking operations are performed outside the `asyncio` event loop.
+
+Example usage:
+
+```python
+from threading import Lock
+
+file_lock = Lock()
+
+def save_credentials():
+    with file_lock:
+        # Perform file operations
+```
+
+
+### Conclusion
+
+By integrating `asyncio` for asynchronous programming and employing both `threading.Lock` and `asyncio.Lock` for appropriate synchronization, our application achieves high concurrency and maintains data integrity across asynchronous operations. This approach allows our Discord bot to efficiently handle multiple commands and interactions concurrently, providing a robust and responsive user experience.
+
