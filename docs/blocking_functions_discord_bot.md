@@ -61,7 +61,7 @@ The name "event loop" is quite descriptive: the loop constantly checks for event
 
 2. **Concurrency Through Cooperation**: The magic of `asyncio`'s concurrency model comes from the `await` keyword. When a coroutine encounters `await`, it's signaling to the event loop that it's okay to pause execution of the current coroutine and work on something else. Later, once the awaited operation is complete (e.g., data has been fetched from a network), the loop will resume the coroutine from where it left off.
 
-3. **I/O Operations**: One of the primary use cases for asynchronous programming is handling I/O-bound operations efficiently. Traditional synchronous I/O operations would block the entire application until they complete. With `asyncio`, when a coroutine starts an I/O operation (like a web request), it will `await` the result, letting the event loop handle other tasks in the meantime.
+3. **I/O Operations**: One of the primary use cases for asynchronous programming is handling I/O-bound operations efficiently. Traditional synchronous I/O operations would block the entire application until they complete. With `asyncio`, when a coroutine starts an I/O operation (like a Ib request), it will `await` the result, letting the event loop handle other tasks in the meantime.
 
 ### Event Loop's Role in the Discord Bot
 
@@ -89,7 +89,7 @@ For the Discord bot, the event loop continuously listens for events from the Dis
 
 ### `run_in_executor` in the Discord Bot
 
-Given that certain methods in the Discord bot are blocking and might take a while to run, we use `run_in_executor` to execute these methods in a separate thread. This way, the bot remains responsive to other commands and interactions, even if one command takes a while to process.
+Given that certain methods in the Discord bot are blocking and might take a while to run, I use `run_in_executor` to execute these methods in a separate thread. This way, the bot remains responsive to other commands and interactions, even if one command takes a while to process.
 
 For example:
 
@@ -97,17 +97,17 @@ For example:
 result = await loop.run_in_executor(None, blocking_function, arg1, arg2)
 ```
 
-This runs `blocking_function` in a separate thread (because we used the default executor), allowing the bot to handle other events while `blocking_function` is processing.
+This runs `blocking_function` in a separate thread (because I used the default executor), allowing the bot to handle other events while `blocking_function` is processing.
 
-### Why and How We Use Locking
+### Why and How I Use Locking
 
 In our application, multiple commands may attempt to read from or write to a shared JSON file concurrently. Without proper synchronization, this could lead to race conditions, where the outcome of operations depends on the non-deterministic timing of events, potentially causing data corruption or loss.
 
-To prevent such race conditions and ensure data integrity, we employ locking mechanisms. Locking ensures that only one operation can access the shared resource (in this case, the JSON file) at a time, serializing access to critical sections of the code that modify the file.
+To prevent such race conditions and ensure data integrity, I employ locking mechanisms. Locking ensures that only one operation can access the shared resource (in this case, the JSON file) at a time, serializing access to critical sections of the code that modify the file.
 
 #### Synchronous Locking with `threading.Lock`
 
-For operations that are executed in a synchronous context or within executor threads (via `loop.run_in_executor`), we use `threading.Lock`. This standard lock from the `threading` module is suitable for managing access to shared resources in a multi-threaded environment, where blocking operations are performed outside the `asyncio` event loop.
+For operations that are executed in a synchronous context or within executor threads (via `loop.run_in_executor`), I use `threading.Lock`. This standard lock from the `threading` module is suitable for managing access to shared resources in a multi-threaded environment, where blocking operations are performed outside the `asyncio` event loop.
 
 Example usage:
 
