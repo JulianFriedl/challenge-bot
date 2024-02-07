@@ -2,7 +2,7 @@
 
 `discord.py` is a modern, easy-to-use Python library that allows you to interact with the Discord API. With it, you can create bots, manage servers, send messages, and more. One of the features introduced in recent versions of the library is Application Commands (often referred to as slash commands due to their `/` prefix in Discord).
 
-This document will provide a brief overview of `discord.py` (Version: 1.7.3), focusing on Application Commands and how they were utilized in a provided code.
+This document will provide a brief overview of `discord.py` (Version: 1.7.3), focusing on Application Commands.
 
 
 ## Basics of discord.py
