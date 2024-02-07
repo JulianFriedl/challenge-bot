@@ -101,11 +101,11 @@ class WeekCommand:
             placement_emoji = ""
             if adjusted_placement == 1:  # First place
                 placement_emoji = "🥇"
-            elif adjusted_placement == 2:  # Second place
-                placement_emoji = "🥈"
-            elif adjusted_placement == 3:  # Third place
-                placement_emoji = "🥉"
-
+            # elif adjusted_placement == 2:  # Second place
+            #     placement_emoji = "🥈"
+            # elif adjusted_placement == 3:  # Third place
+            #     placement_emoji = "🥉"
+            
             # Construct the value string based on athlete's status
             if is_joker:
                 value = f"{placement_emoji}Muas net zoin JOKER! {points}/{points_required} Punkt/e.🃏\n"
