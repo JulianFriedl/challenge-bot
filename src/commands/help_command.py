@@ -19,7 +19,7 @@ def help_embed():
     """
         Create a Discord Embed object for the help command.
     """
-    logger.info("Help Command used.")
+    logger.info("Help Command called.")
     embed = discord.Embed(title="Available Commands:", color=0x0073FF)
 
     embed.add_field(

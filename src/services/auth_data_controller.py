@@ -14,7 +14,7 @@ from config.rules_preset import *
 from config.log_config import setup_logging
 from threading import Lock
 
-file_lock = Lock()
+file_lock = Lock() #locking mechanism for threading
 
 
 setup_logging()

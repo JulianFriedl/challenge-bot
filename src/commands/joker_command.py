@@ -28,7 +28,7 @@ class JokerCommand:
         self.discord_user_id = discord_user_id
 
     def joker(self):
-        logger.info("Joker Command Used.")
+        logger.info("Joker Command called.")
         creds = load_credentials()
         athlete = None
         if creds:

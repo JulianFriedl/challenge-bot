@@ -33,7 +33,7 @@ def strava_auth(discord_user_id: int):
     this function creates a link for the authorization with an embedded Link that leads back to my
     Webserver.
     """
-    logger.info("Strava auth Command used.")
+    logger.info("Strava auth Command called.")
      # Include the Discord user ID in the redirect URI
     modified_redirect_uri = f"{REDIRECT_URI}?discord_id={discord_user_id}"
 

@@ -46,6 +46,7 @@ class WeekCommand:
         This method retrieves the activities for each athlete and determines if they need to pay based on the points earned.
         It returns a Discord embed message with the payment details for the week.
         """
+        logger.info(f"Week Command called, week:{self.week}.")
         loaded_creds = auth_data_controller.load_credentials()
         if loaded_creds is None:
             embed = discord.Embed(title="No Athletes Registered",
@@ -130,7 +131,7 @@ class WeekCommand:
         This method iterates over the activities and calculates the points earned based on HIT workouts and activity duration.
         It returns the total points earned.
         """
-        logger.info(f"Week: {self.week}")
+        
         points = 0
         hit_counter = 0
         activities_done_set = set()
