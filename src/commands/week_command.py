@@ -109,11 +109,11 @@ class WeekCommand:
             
             # Construct the value string based on athlete's status
             if is_joker:
-                value = f"{placement_emoji}Muas net zoin JOKER! {points}/{points_required} Punkt/e.🃏\n"
+                value = f"{placement_emoji}muas net zoin JOKER! {points}/{points_required} Punkt/e.🃏\n"
             elif points < points_required:
-                value = f"{placement_emoji}Muas {amount}€ zoin! {points}/{points_required} Punkt/e.❌\n"
+                value = f"{placement_emoji}muas {amount}€ zoin! {points}/{points_required} Punkt/e.❌\n"
             else:
-                value = f"{placement_emoji}Muas net zoin! {points}/{points_required} Punkt/e.✅\n"
+                value = f"{placement_emoji}muas net zoin! {points}/{points_required} Punkt/e.✅\n"
             
             # Add the field to the embed with the athlete's information
             embed.add_field(name=username, value=value, inline=False)
