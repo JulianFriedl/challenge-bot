@@ -12,7 +12,7 @@ import json
 
 
 import services.auth_refresh as auth_refresh
-import services.auth_data_controller as auth_data_controller
+import services.data_controller as data_controller
 from api.api_calls import api_request, API_CALL_TYPE
 
 
@@ -43,9 +43,9 @@ class Athlete:
         self.joker_weeks = self.credentials.get('vars', {}).get('joker_weeks', [])
         self.week_results = self.credentials.get('vars', {}).get('week_results', [])
 
-        self.discord_id = self.credentials.get('discord_id', 0)
+        self.discord_id = self.credentials.get('discord_user_id', 0)
 
-        auth_data_controller.save_strava_credentials(json.dumps(self.credentials))
+        data_controller.save_strava_credentials(json.dumps(self.credentials))
 
     def fetch_athlete_activities(self, start_date : datetime, end_date : datetime):
         """

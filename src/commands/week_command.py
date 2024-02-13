@@ -11,12 +11,12 @@ import discord
 import logging
 
 from config.rules_preset import MULTIPLIER, MULTIPLIER_ON
-import services.auth_data_controller as auth_data_controller
+import services.data_controller as data_controller
 from api.api_calls import API_CALL_TYPE
 from models.athlete import Athlete
 from models.activity import Activity
 from config.log_config import setup_logging
-from services.auth_data_controller import update_athlete_vars
+from services.data_controller import save_routes, update_athlete_vars
 
 setup_logging()
 logger = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ class WeekCommand:
         It returns a Discord embed message with the payment details for the week.
         """
         logger.info(f"Week Command called, week:{self.week}.")
-        loaded_creds = auth_data_controller.load_credentials()
+        loaded_creds = data_controller.load_credentials()
         if loaded_creds is None:
             embed = discord.Embed(title="No Athletes Registered",
                                   description="There are no authenticated athletes. Please use the /strava_auth command.",
@@ -139,6 +139,7 @@ class WeekCommand:
         for activity_data in reversed(activities):
             activity = Activity(activity_data)
             if activity.is_in_week(self.week):
+                save_routes(activity, athlete) # save the map data for later usage
                 hit_counter = activity.count_hit_workouts(
                     hit_counter, activities_done_set, athlete)
                 if hit_counter == athlete.hit_required:

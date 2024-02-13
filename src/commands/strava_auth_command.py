@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 import discord
 import logging
 
-import services.auth_data_controller as auth_data_controller
+import services.data_controller as data_controller
 from config.log_config import setup_logging
 
 
@@ -68,5 +68,5 @@ def exchange_code(code:str, discord_user_id:str):
     if(response.status_code != 200):
         raise Exception(f"Failed to get token: Status code {response.status_code}, Response: {response.text}")
     
-    auth_data_controller.save_strava_credentials(response.text, discord_user_id)
+    data_controller.save_strava_credentials(response.text, discord_user_id)
    

@@ -11,7 +11,7 @@ import json
 import discord
 import logging
 
-from services.auth_data_controller import load_credentials, update_athlete_vars
+from services.data_controller import load_credentials, update_athlete_vars
 from models.athlete import Athlete
 from config.log_config import setup_logging
 

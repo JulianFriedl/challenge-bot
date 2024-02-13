@@ -24,11 +24,20 @@ class Activity:
 
         This method extracts the necessary information from the activity data and sets the corresponding attributes.
         """
-        self.type = activity_data["type"]
-        self.duration = activity_data["moving_time"] / 60
-        self.date = datetime.datetime.strptime(activity_data["start_date_local"][:10], "%Y-%m-%d")
-        self.start_date = datetime.datetime.strptime(activity_data["start_date_local"], "%Y-%m-%dT%H:%M:%SZ")
-        self.elapsed_time = datetime.timedelta(seconds=int(activity_data["elapsed_time"]))
+        self.id = activity_data.get("id")
+        self.type = activity_data.get("type")
+        self.duration = activity_data.get("moving_time", 0) / 60  
+        self.date = datetime.datetime.strptime(activity_data.get("start_date_local", "1900-01-01")[:10], "%Y-%m-%d")
+            
+        # Handling start_date with a default date if not present
+        start_date_local = activity_data.get("start_date_local", "1900-01-01T00:00:00Z")
+        self.start_date = datetime.datetime.strptime(start_date_local, "%Y-%m-%dT%H:%M:%SZ")
+        self.elapsed_time = datetime.timedelta(seconds=int(activity_data.get("elapsed_time", 0)))
+            
+        # For routes
+        self.map = activity_data.get("map", {})  
+        self.distance = activity_data.get("distance", 0) / 1000  
+        self.elev_gain = activity_data.get("total_elevation_gain", 0) 
 
     def is_in_week(self, week : int):
         """

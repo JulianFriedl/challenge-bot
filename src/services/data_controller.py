@@ -6,6 +6,7 @@ description: This module handles saving and loading credentials for the Discord 
 Author: Julian Friedl
 """
 
+import datetime
 import json
 import os
 import logging
@@ -14,7 +15,10 @@ from config.rules_preset import *
 from config.log_config import setup_logging
 from threading import Lock
 
-file_lock = Lock() #locking mechanism for threading
+from models.activity import Activity
+from models.athlete import Athlete
+
+file_lock = Lock()  # locking mechanism for threading
 
 
 setup_logging()
@@ -23,7 +27,8 @@ logger = logging.getLogger(__name__)
 SRC_PATH = os.path.dirname(__file__)
 BASE_PATH = os.path.dirname(SRC_PATH)
 DATA_PATH = os.path.join(os.path.dirname(BASE_PATH), 'data')
-FILENAME = os.path.join(DATA_PATH, 'credentials.json')
+CREDENTIALS = os.path.join(DATA_PATH, 'credentials.json')
+ROUTES = os.path.join(DATA_PATH, 'routes.json')
 
 
 def save_strava_credentials(response: json = None, discord_user_id: str = None):
@@ -64,7 +69,7 @@ def save_strava_credentials(response: json = None, discord_user_id: str = None):
         credentials['vars'] = athlete_vars
         credentials['discord_user_id'] = discord_user_id
 
-        data = load_or_create_data_dir()
+        data = load_or_create_credentials()
 
         # Update or append the new credentials
         for existing_cred in data:
@@ -76,30 +81,76 @@ def save_strava_credentials(response: json = None, discord_user_id: str = None):
         else:
             data.append(credentials)
 
-        with open(FILENAME, 'w') as f:
+        with open(CREDENTIALS, 'w') as f:
             json.dump(data, f, default=serialize, indent=4)
 
 
 def update_athlete_vars(credentials: dict):
     with file_lock:
-        data = load_or_create_data_dir()
+        data = load_or_create_credentials()
         for existing_cred in data:
             if existing_cred['strava_data']['athlete']['id'] == credentials['strava_data']['athlete']['id']:
                 if credentials['vars']:
                     existing_cred['vars'] = credentials['vars']
                 break
-        with open(FILENAME, 'w') as f:
+        with open(CREDENTIALS, 'w') as f:
             json.dump(data, f, default=serialize, indent=4)
 
 
-def load_or_create_data_dir():
+def save_routes(activity: Activity, user: Athlete):
+    new_route = {
+        "user_id": user.user_id,
+        "discord_user_id": user.discord_id,
+        "user_name": user.username,
+        "activity_id": activity.id,
+        "type": activity.type,
+        "start_date": activity.start_date,
+        "moving_time": activity.duration,
+        "distance": activity.distance,
+        "total_elevation_gain": activity.elev_gain,
+        "map": activity.map
+    }
+
+    with file_lock:
+        data = {"metadata": {"total_moving_time": 0, "total_distance": 0, "total_elevation_gain": 0}, "routes": []}
+        
+        if os.path.exists(ROUTES) and os.path.getsize(ROUTES) > 0:
+            with open(ROUTES, 'r') as file:
+                data = json.load(file)
+                
+        existing_route_index = next((index for (index, d) in enumerate(data["routes"]) if d["activity_id"] == new_route["activity_id"]), None)
+        
+        if existing_route_index is not None:
+            # Subtract old values from metadata
+            old_route = data["routes"][existing_route_index]
+            data["metadata"]["total_moving_time"] -= old_route.get("moving_time", 0)
+            data["metadata"]["total_distance"] -= old_route.get("distance", 0)
+            data["metadata"]["total_elevation_gain"] -= old_route.get("total_elevation_gain", 0)
+            
+            # Replace the existing route
+            data["routes"][existing_route_index] = new_route
+        else:
+            # Append the new route
+            data["routes"].append(new_route)
+        
+        # Add new values to metadata
+        data["metadata"]["total_moving_time"] += new_route.get("moving_time", 0)
+        data["metadata"]["total_distance"] += new_route.get("distance", 0)
+        data["metadata"]["total_elevation_gain"] += new_route.get("total_elevation_gain", 0)
+        
+        with open(ROUTES, 'w') as f:
+            json.dump(data, f, default=serialize, indent=4)
+
+
+
+def load_or_create_credentials():
     # Create the data directory if it doesn't exist
     if not os.path.exists(DATA_PATH):
         os.makedirs(DATA_PATH)
 
     # Load existing data or initialize it
-    if os.path.exists(FILENAME) and os.path.getsize(FILENAME) > 0:
-        with open(FILENAME, 'r') as file:
+    if os.path.exists(CREDENTIALS) and os.path.getsize(CREDENTIALS) > 0:
+        with open(CREDENTIALS, 'r') as file:
             data = json.load(file)
     else:
         data = []
@@ -114,8 +165,8 @@ def load_credentials():
     This function checks if a file with user credentials exists, and if so, loads and returns the credentials.
     """
     with file_lock:
-        if os.path.exists(FILENAME) and os.path.getsize(FILENAME) != 0:
-            with open(FILENAME, 'r') as f:
+        if os.path.exists(CREDENTIALS) and os.path.getsize(CREDENTIALS) != 0:
+            with open(CREDENTIALS, 'r') as f:
                 credentials = json.load(f)
             return credentials
         return None
@@ -136,5 +187,7 @@ def serialize(obj):
         return {str(k): serialize(v) for k, v in obj.items()}
     elif isinstance(obj, (list, tuple)):
         return [serialize(i) for i in obj]
+    elif isinstance(obj, datetime.datetime):
+        return obj.isoformat()
     else:
         return obj

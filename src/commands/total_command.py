@@ -11,7 +11,7 @@ import time
 import discord
 import logging
 
-import services.auth_data_controller as auth_data_controller
+import services.data_controller as data_controller
 from commands.week_command import WeekCommand
 from api.api_calls import API_CALL_TYPE
 from models.athlete import Athlete
@@ -43,7 +43,7 @@ class TotalCommand:
         # end_date is exclusive in the Strava API so use the next day at 00:00:00 time
         end_date = datetime.date.fromisocalendar(current_year, week_before_current_week, 7) + datetime.timedelta(days=1)
 
-        loaded_creds = auth_data_controller.load_credentials()
+        loaded_creds = data_controller.load_credentials()
 
         if loaded_creds is None:
             embed = discord.Embed(title="No Athletes Registered",
