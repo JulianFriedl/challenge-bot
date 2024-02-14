@@ -61,6 +61,7 @@ def save_strava_athletes(response: json = None, discord_user_id: str = None):
     This function takes a JSON string containing user athletes, 
     checks if a file for the user already exists, and either appends to or overwrites the file.
     """
+    clear_athlete_vars()
     with file_lock:
         logger.info("Saving Credentials.")
         if response:
@@ -117,6 +118,22 @@ def update_athlete_vars(athlete: dict):
                 if athlete['vars']:
                     existing_cred['vars'] = athlete['vars']
                 break
+        with open(ATHLETES, 'w') as f:
+            json.dump(data, f, default=serialize, indent=4)
+
+def clear_athlete_vars():
+    """
+    Resets the athlete vars.
+    """
+    with file_lock:
+        data = load_or_create_athletes()
+        for existing_cred in data:
+            existing_cred["vars"] = {
+                "joker": 1,
+                "joker_weeks": [],
+                "week_results": []
+            }
+    
         with open(ATHLETES, 'w') as f:
             json.dump(data, f, default=serialize, indent=4)
 
