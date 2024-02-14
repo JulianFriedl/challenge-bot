@@ -152,7 +152,7 @@ class TotalCommand:
                 embed.add_field(name=username, value=f"muas {amount}€ zoin.{emoji}", inline=False)
             else:
                 embed.add_field(name=username, value=f"muas nix zoin.", inline=False)
-        embed.add_field(name="Api requests", value=f"{self.num_of_API_requests} Weeks retrieved from the strava API. \n{self.num_of_retrieve_Cache} Weeks retrieved from cache.\n", inline=False)
+        embed.add_field(name="Api requests", value=f"{self.num_of_API_requests} Weeks requested from the strava API. \n{self.num_of_retrieve_Cache} Weeks retrieved from cache.\n", inline=False)
 
 
         return embed

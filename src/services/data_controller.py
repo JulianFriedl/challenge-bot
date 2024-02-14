@@ -61,7 +61,6 @@ def save_strava_athletes(response: json = None, discord_user_id: str = None):
     This function takes a JSON string containing user athletes, 
     checks if a file for the user already exists, and either appends to or overwrites the file.
     """
-    clear_athlete_vars()
     with file_lock:
         logger.info("Saving Credentials.")
         if response:
