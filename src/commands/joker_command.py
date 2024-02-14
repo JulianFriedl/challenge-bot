@@ -11,7 +11,7 @@ import json
 import discord
 import logging
 
-from services.data_controller import load_credentials, update_athlete_vars
+from services.data_controller import load_athletes, update_athlete_vars
 from models.athlete import Athlete
 from config.log_config import setup_logging
 
@@ -29,7 +29,7 @@ class JokerCommand:
 
     def joker(self):
         logger.info("Joker Command called.")
-        creds = load_credentials()
+        creds = load_athletes()
         athlete = None
         if creds:
             for cred in creds:

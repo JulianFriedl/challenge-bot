@@ -1,0 +1,34 @@
+{
+    "description": "This module contains all the constants that are used by the bot commands.",
+    "author": "Julian Friedl",
+    "constants": {
+      "CHALLENGE_START_WEEK": 1,
+      "PRICE_PER_WEEK": 5,
+      "RULES": {
+        "Ride": 60,
+        "Run": 30,
+        "WeightTraining": 60,
+        "NordicSki": 60,
+        "BackcountrySki": 60,
+        "Hike": 60,
+        "Walk": 60,
+        "Swim": 30,
+        "AlpineSki": 120,
+        "RockClimbing": 60,
+        "Workout": 60,
+        "Snowshoe": 60,
+        "VirtualRide": 60,
+        "Kayaking": 60
+      },
+      "MULTIPLIER": 2,
+      "MULTIPLIER_ON": true,
+      "POINTS_REQUIRED": 3,
+      "JOKER": 1,
+      "SPAZI": 3,
+      "WALKING_LIMIT": 1,
+      "HIT_REQUIRED": 2,
+      "HIT_MIN_TIME": 15,
+      "MIN_DURATION_MULTI_DAY": 360
+    }
+  }
+  

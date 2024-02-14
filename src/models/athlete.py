@@ -45,9 +45,9 @@ class Athlete:
 
         self.discord_id = self.credentials.get('discord_user_id', 0)
 
-        data_controller.save_strava_credentials(json.dumps(self.credentials))
+        data_controller.save_strava_athletes(json.dumps(self.credentials))
 
-    def fetch_athlete_activities(self, start_date : datetime, end_date : datetime):
+    def fetch_athlete_activities(self, start_date : datetime, end_date : datetime, cache:bool = True):
         """
         Fetch all the activities in a year. The api can send a max of 200 Activities per request. 
         By iterating over the page parameter until I either get an error or the returned data is null,
@@ -89,3 +89,4 @@ class Athlete:
             if len(activities) < PER_PAGE:
                 end_of_results = True
         return (data, num_of_API_requests, num_of_retrieve_Cache)
+       

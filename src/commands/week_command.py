@@ -9,10 +9,10 @@ Author: Julian Friedl
 import datetime
 import discord
 import logging
+import os
+from dotenv import load_dotenv
 
-from config.rules_preset import MULTIPLIER, MULTIPLIER_ON
 import services.data_controller as data_controller
-from api.api_calls import API_CALL_TYPE
 from models.athlete import Athlete
 from models.activity import Activity
 from config.log_config import setup_logging
@@ -21,6 +21,14 @@ from services.data_controller import save_routes, update_athlete_vars
 setup_logging()
 logger = logging.getLogger(__name__)
 
+load_dotenv()
+
+YEAR = int(os.getenv("YEAR", datetime.date.today().year))
+
+RULES = data_controller.load_global_rules()
+
+MULTIPLIER = RULES["MULTIPLIER"]
+MULTIPLIER_ON = RULES["MULTIPLIER_ON"]
 
 class WeekCommand:
 
@@ -31,11 +39,15 @@ class WeekCommand:
         This method sets the week number, year, start date, and end date based on the provided week.
         """
         self.week = week
-        self.year = datetime.date.today().year
+        self.year = YEAR  # Use YEAR from the environment variable or the current year if not set
+        if self.year == datetime.date.today().year:
+            # For the current year, check if the week is not beyond the current week
+            current_week = datetime.date.today().isocalendar()[1]
+            if week > current_week:
+                raise ValueError("Week number cannot be in the future for the current year")
         self.start_date = datetime.date.fromisocalendar(self.year, week, 1)
-        # end_date is exclusive in the strava API so use the next day at 00:00:00 time
-        self.end_date = datetime.date.fromisocalendar(
-            self.year, week, 7) + datetime.timedelta(days=1)
+        # end_date is exclusive in the Strava API so use the next day at 00:00:00 time
+        self.end_date = datetime.date.fromisocalendar(self.year, week, 7) + datetime.timedelta(days=1)
         self.num_of_API_requests = 0
         self.num_of_retrieve_Cache = 0
 
@@ -47,7 +59,7 @@ class WeekCommand:
         It returns a Discord embed message with the payment details for the week.
         """
         logger.info(f"Week Command called, week:{self.week}.")
-        loaded_creds = data_controller.load_credentials()
+        loaded_creds = data_controller.load_athletes()
         if loaded_creds is None:
             embed = discord.Embed(title="No Athletes Registered",
                                   description="There are no authenticated athletes. Please use the /strava_auth command.",
@@ -266,7 +278,7 @@ class WeekCommand:
         # end_date is exclusive in the strava API so use the next day at 00:00:00 time
         end_date = datetime.date.fromisocalendar(
             self.year, weeks_missing[0], 7) + datetime.timedelta(days=1)
-        activities, num_of_API_requests, num_of_retrieve_Cache  = athlete.fetch_athlete_activities(start_date, end_date)
+        activities, num_of_API_requests, num_of_retrieve_Cache  = athlete.fetch_athlete_activities(start_date, end_date, cache=False)
         self.num_of_API_requests += num_of_API_requests
         self.num_of_retrieve_Cache += num_of_retrieve_Cache
 

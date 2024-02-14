@@ -24,7 +24,7 @@ BASE_PATH = os.path.dirname(SRC_PATH)
 CACHE_PATH = os.path.join(os.path.dirname(BASE_PATH), 'cache')
 os.makedirs(CACHE_PATH, exist_ok=True)  # make sure the directory exists
 
-def api_request(url:str, headers:dict, params:dict, username:str, user_id:str):
+def api_request(url:str, headers:dict, params:dict, username:str, user_id:str, cache:bool = True):
     """
     Makes a GET request to the specified URL and handles HTTP errors.
 
@@ -43,32 +43,33 @@ def api_request(url:str, headers:dict, params:dict, username:str, user_id:str):
         response (dict or None): The JSON response if the request was successful, otherwise None.
         API_CALL_TYPE (Cache = 1 API = 2, Error = 3): Cache if the cache is used and API if the api is used and Error if error occurs
     """
-    #check if the cache dir exists
+       #check if the cache dir exists
     if not os.path.exists(CACHE_PATH):
         os.makedirs(CACHE_PATH)
-
-   # Create a hash of the url, headers and params to uniquely identify the request
-    req_hash = hashlib.sha256() 
-    req_hash.update(url.encode('utf-8'))
-    #req_hash.update(str(headers).encode('utf-8'))
-    #I am leaving out the headers because the auth token changes every 6 hours, so that would mean the cache expires at the same rate
-    #But to still be able to uniquely identify each cache file i will include the uid in the hash
-    req_hash.update(str(user_id).encode('utf-8'))
-    req_hash.update(str(params).encode('utf-8'))
-    cache_file = os.path.join(CACHE_PATH, req_hash.hexdigest())
-    # If the cache file exists, load the cached response
-    if os.path.exists(cache_file):
-        with open(cache_file, 'rb') as f:
-            return pickle.load(f), API_CALL_TYPE.Cache
         
-
+    if cache:
+    # Create a hash of the url, headers and params to uniquely identify the request
+        req_hash = hashlib.sha256() 
+        req_hash.update(url.encode('utf-8'))
+        #req_hash.update(str(headers).encode('utf-8'))
+        #I am leaving out the headers because the auth token changes every 6 hours, so that would mean the cache expires at the same rate
+        #But to still be able to uniquely identify each cache file i will include the uid in the hash
+        req_hash.update(str(user_id).encode('utf-8'))
+        req_hash.update(str(params).encode('utf-8'))
+        cache_file = os.path.join(CACHE_PATH, req_hash.hexdigest())
+        # If the cache file exists, load the cached response
+        if os.path.exists(cache_file):
+            with open(cache_file, 'rb') as f:
+                return pickle.load(f), API_CALL_TYPE.Cache
+        
     try:
         response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()  # Raises a HTTPError if the status is 4xx, 5xx
         
-        # Cache the response
-        with open(cache_file, 'wb') as f:
-            pickle.dump(response.json(), f)
+        if cache:
+            # Cache the response
+            with open(cache_file, 'wb') as f:
+                pickle.dump(response.json(), f)
 
         return response.json(), API_CALL_TYPE.API
     except requests.exceptions.HTTPError as e:

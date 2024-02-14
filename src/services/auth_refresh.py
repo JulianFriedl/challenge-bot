@@ -11,8 +11,8 @@ setup_logging()
 logger = logging.getLogger(__name__)
 load_dotenv()
 
-CLIENT_ID = os.getenv('CLIENT_ID')
-CLIENT_SECRETE = os.getenv('CLIENT_SECRETE')
+STRAVA_CLIENT_ID = os.getenv('STRAVA_CLIENT_ID')
+STRAVA_CLIENT_SECRETE = os.getenv('STRAVA_CLIENT_SECRETE')
 
 def refresh_token(cred:dict):
     # Get the access token, refresh token and expiration date from the credential dictionary
@@ -29,8 +29,8 @@ def refresh_token(cred:dict):
 
         # Set up the data for the api call
         data = {
-            'client_id': CLIENT_ID,
-            'client_secret': CLIENT_SECRETE,
+            'client_id': STRAVA_CLIENT_ID,
+            'client_secret': STRAVA_CLIENT_SECRETE,
             'grant_type': 'refresh_token',
             'refresh_token': refresh_token
         }

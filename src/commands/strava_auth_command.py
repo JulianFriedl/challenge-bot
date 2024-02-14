@@ -22,8 +22,8 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-CLIENT_ID = os.getenv("CLIENT_ID")
-CLIENT_SECRETE = os.getenv("CLIENT_SECRETE")
+STRAVA_CLIENT_ID = os.getenv("STRAVA_CLIENT_ID")
+STRAVA_CLIENT_SECRETE = os.getenv("STRAVA_CLIENT_SECRETE")
 REDIRECT_URI = os.getenv("REDIRECT_URI")
 
 def strava_auth(discord_user_id: int):
@@ -38,7 +38,7 @@ def strava_auth(discord_user_id: int):
     modified_redirect_uri = f"{REDIRECT_URI}?discord_id={discord_user_id}"
 
     params = {
-        'client_id': CLIENT_ID,
+        'client_id': STRAVA_CLIENT_ID,
         'response_type': 'code',
         'redirect_uri': modified_redirect_uri,
         'approval_prompt': 'force',
@@ -58,8 +58,8 @@ def exchange_code(code:str, discord_user_id:str):
     then saves the credentials using the auth_data_controller.
     """
     data = {
-        'client_id': CLIENT_ID,
-        'client_secret': CLIENT_SECRETE,
+        'client_id': STRAVA_CLIENT_ID,
+        'client_secret': STRAVA_CLIENT_SECRETE,
         'code': code,
         'grant_type': 'authorization_code'
     }
@@ -68,5 +68,5 @@ def exchange_code(code:str, discord_user_id:str):
     if(response.status_code != 200):
         raise Exception(f"Failed to get token: Status code {response.status_code}, Response: {response.text}")
     
-    data_controller.save_strava_credentials(response.text, discord_user_id)
+    data_controller.save_strava_athletes(response.text, discord_user_id)
    
