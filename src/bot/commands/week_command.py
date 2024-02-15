@@ -12,11 +12,11 @@ import logging
 import os
 from dotenv import load_dotenv
 
-import services.data_controller as data_controller
-from models.athlete import Athlete
-from models.activity import Activity
-from config.log_config import setup_logging
-from services.data_controller import save_routes, update_athlete_vars
+import src.shared.services.athlete_data_controller as athlete_data_controller
+import src.shared.services.routes_data_controller as routes_data_controller
+from src.shared.models.athlete import Athlete
+from src.shared.models.activity import Activity
+from src.shared.config.log_config import setup_logging
 
 setup_logging()
 logger = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ load_dotenv()
 
 YEAR = int(os.getenv("YEAR", datetime.date.today().year))
 
-RULES = data_controller.load_global_rules()
+RULES = athlete_data_controller.load_global_rules()
 
 MULTIPLIER = RULES["MULTIPLIER"]
 MULTIPLIER_ON = RULES["MULTIPLIER_ON"]
@@ -59,7 +59,7 @@ class WeekCommand:
         It returns a Discord embed message with the payment details for the week.
         """
         logger.info(f"Week Command called, week:{self.week}.")
-        loaded_creds = data_controller.load_athletes()
+        loaded_creds = athlete_data_controller.load_athletes()
         if loaded_creds is None:
             embed = discord.Embed(title="No Athletes Registered",
                                   description="There are no authenticated athletes. Please use the /strava_auth command.",
@@ -151,7 +151,7 @@ class WeekCommand:
         for activity_data in reversed(activities):
             activity = Activity(activity_data)
             if activity.is_in_week(self.week):
-                save_routes(activity, athlete) # save the map data for later usage
+                routes_data_controller.save_routes(activity, athlete) # save the map data for later usage
                 hit_counter = activity.count_hit_workouts(
                     hit_counter, activities_done_set, athlete)
                 if hit_counter == athlete.hit_required:
@@ -200,7 +200,7 @@ class WeekCommand:
         athlete.credentials["vars"]["week_results"] = athlete.week_results
 
         # Call the function to update the athlete's vars in storage or database
-        update_athlete_vars(athlete.credentials)
+        athlete_data_controller.update_athlete_vars(athlete.credentials)
 
         return points
 

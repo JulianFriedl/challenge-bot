@@ -21,21 +21,27 @@ cd challenge-bot
 
 It's recommended to use a virtual environment for Python projects to manage dependencies separately for each project.
 
-1. **Create a Virtual Environment**
+## Usage
+
+### 1. Create a Virtual Environment
+
+To create a new virtual environment, run the following command in your project directory:
 
 ```bash
 python3 -m venv venv
 ```
 
-2. **Activate the Virtual Environment**
+### 2. Activate the Virtual Environment
 
-- On Linux or macOS:
+Activate the virtual environment before installing dependencies or running the application:
+
+- **On Linux or macOS**:
 
   ```bash
   source venv/bin/activate
   ```
 
-- On Windows:
+- **On Windows**:
 
   ```cmd
   venv\Scripts\activate.bat
@@ -43,7 +49,7 @@ python3 -m venv venv
 
 ### Install Required Libraries
 
-With the virtual environment activated, install the required libraries using `pip`:
+With the virtual environment activated, install the project's required libraries:
 
 ```bash
 pip install -r requirements.txt
@@ -51,24 +57,26 @@ pip install -r requirements.txt
 
 ### Configure Environment Variables
 
-Create a `.env` file in the project directory and add your Discord bot token, Strava client ID and secret, and redirect URI as environment variables:
+Set up your environment variables by creating a `.env` file in the project's root directory. Populate it with the necessary values:
 
 ```plaintext
 DISCORD_TOKEN=YOUR_DISCORD_BOT_TOKEN
 STRAVA_CLIENT_ID=YOUR_STRAVA_CLIENT_ID
-STRAVA_CLIENT_SECRETE=YOUR_STRAVA_CLIENT_SECRET
+STRAVA_CLIENT_SECRET=YOUR_STRAVA_CLIENT_SECRET
 REDIRECT_URI=http://YOUR_ADDRESS/strava_auth
 PORT=YOUR_PORT
 YEAR=The Year of the Challenge
 ```
 
-## Usage
+### Running the Application
 
-With the virtual environment activated, run the `bot_app.py` script to start the Discord bot and the Flask web server:
+To start the Discord bot and the Flask web server, navigate to the project root and run the application using the `-m` flag. This approach respects the package structure of your project:
 
 ```bash
-python bot_app.py
+python3 -m src.bot.bot_app
 ```
+
+Ensure you're in the root directory of your project (`challenge-bot`) when executing the above command to correctly resolve module paths.
 
 ### Invite the Bot to Your Discord Server
 

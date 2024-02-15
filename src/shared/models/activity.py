@@ -9,8 +9,8 @@ Author: Julian Friedl
 import datetime
 import logging
 
-from models.athlete import Athlete
-from config.log_config import setup_logging
+from src.shared.models.athlete import Athlete
+from src.shared.config.log_config import setup_logging
 
 setup_logging()
 logger = logging.getLogger(__name__)
@@ -35,6 +35,9 @@ class Activity:
         self.elapsed_time = datetime.timedelta(seconds=int(activity_data.get("elapsed_time", 0)))
             
         # For routes
+        self.name = activity_data.get("name", "")
+        self.suffer_score = self.suffer_score = activity_data.get("suffer_score", 0)
+        self.kudos = activity_data.get("kudos_count", 0) 
         self.map = activity_data.get("map", {})  
         self.distance = activity_data.get("distance", 0) / 1000  
         self.elev_gain = activity_data.get("total_elevation_gain", 0) 

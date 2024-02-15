@@ -11,9 +11,9 @@ import json
 import discord
 import logging
 
-from services.data_controller import load_athletes, update_athlete_vars
-from models.athlete import Athlete
-from config.log_config import setup_logging
+from src.shared.services.athlete_data_controller import load_athletes, update_athlete_vars
+from src.shared.models.athlete import Athlete
+from src.shared.config.log_config import setup_logging
 
 
 setup_logging()

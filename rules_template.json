@@ -1,5 +1,5 @@
 {
-    "description": "This module contains all the constants that are used by the bot commands.",
+    "description": "This module contains a template of all the constants that are used by the bot commands.",
     "author": "Julian Friedl",
     "constants": {
       "CHALLENGE_START_WEEK": 1,

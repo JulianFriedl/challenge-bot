@@ -4,7 +4,7 @@ import time
 import logging
 
 from dotenv import load_dotenv
-from config.log_config import setup_logging
+from src.shared.config.log_config import setup_logging
 
 
 setup_logging()

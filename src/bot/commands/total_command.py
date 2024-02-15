@@ -12,10 +12,10 @@ import logging
 import os
 from dotenv import load_dotenv
 
-import services.data_controller as data_controller
-from commands.week_command import WeekCommand
-from models.athlete import Athlete
-from config.log_config import setup_logging
+import src.shared.services.athlete_data_controller as athlete_data_controller
+from src.bot.commands.week_command import WeekCommand
+from src.shared.models.athlete import Athlete
+from src.shared.config.log_config import setup_logging
 
 
 setup_logging()
@@ -25,7 +25,7 @@ load_dotenv()
 
 YEAR = int(os.getenv("YEAR", datetime.date.today().year))
 
-RULES = data_controller.load_global_rules()
+RULES = athlete_data_controller.load_global_rules()
 
 CHALLENGE_START_WEEK = RULES["CHALLENGE_START_WEEK"]
 MULTIPLIER = RULES["MULTIPLIER"]
@@ -61,7 +61,7 @@ class TotalCommand:
         start_date = datetime.date.fromisocalendar(YEAR, 1, 1)  # Always start from the first week
         end_date = datetime.date.fromisocalendar(YEAR, week_before_current_week, 7) + datetime.timedelta(days=1)
 
-        loaded_creds = data_controller.load_athletes()
+        loaded_creds = athlete_data_controller.load_athletes()
 
         if loaded_creds is None:
             embed = discord.Embed(title="No Athletes Registered",
@@ -81,11 +81,11 @@ class TotalCommand:
             weeks_to_fetch = [week for week in range(CHALLENGE_START_WEEK, week_before_current_week + 1)
                             if week not in week_results_dict]
             
-
+            
             if weeks_to_fetch:  # Check if the list is not empty
                 start_date = datetime.date.fromisocalendar(YEAR, weeks_to_fetch[0], 1)
                 # Fetch activities for the needed weeks 
-                activities, api_requests, chache_retrieves = athlete.fetch_athlete_activities(start_date, end_date, cache=False)
+                activities, api_requests, chache_retrieves = athlete.fetch_athlete_activities(start_date, end_date, cache=True)
             self.num_of_API_requests += len(weeks_to_fetch)
             self.num_of_retrieve_Cache += len(week_results_dict)
             

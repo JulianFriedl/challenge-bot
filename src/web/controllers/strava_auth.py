@@ -1,7 +1,7 @@
 from flask import request
 import logging
 from traceback import format_exc
-from commands.strava_auth_command import exchange_code
+from src.bot.commands.strava_auth_command import exchange_code
 
 # Initialize logger
 logger = logging.getLogger(__name__)

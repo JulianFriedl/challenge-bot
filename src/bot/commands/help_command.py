@@ -9,7 +9,7 @@ Author: Julian Friedl
 import discord
 import logging
 
-from config.log_config import setup_logging
+from src.shared.config.log_config import setup_logging
 
 
 setup_logging()

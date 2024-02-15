@@ -9,12 +9,16 @@ Author: Julian Friedl
 import datetime
 import time
 import json
+import logging
 
 
-import services.auth_refresh as auth_refresh
-import services.data_controller as data_controller
-from api.api_calls import api_request, API_CALL_TYPE
+import src.shared.services.auth_refresh as auth_refresh
+import src.shared.services.athlete_data_controller as athlete_data_controller
+from src.shared.api.api_calls import api_request, API_CALL_TYPE
+from src.shared.config.log_config import setup_logging
 
+setup_logging()
+logger = logging.getLogger(__name__)
 
 class Athlete:
     def __init__(self, credentials: dict):
@@ -45,7 +49,7 @@ class Athlete:
 
         self.discord_id = self.credentials.get('discord_user_id', 0)
 
-        data_controller.save_strava_athletes(json.dumps(self.credentials))
+        athlete_data_controller.save_strava_athletes(json.dumps(self.credentials))
 
     def fetch_athlete_activities(self, start_date : datetime, end_date : datetime, cache:bool = True):
         """
@@ -71,13 +75,12 @@ class Athlete:
         while not end_of_results:
             headers = {"Authorization": f"Bearer {self.access_token}"}
             params = {"before": end_date_seconds, "after": start_date_seconds, "page": page, "per_page": per_page}
-
-            data, api_call_type = api_request("https://www.strava.com/api/v3/athlete/activities", headers, params, self.username, self.user_id)
+            
+            data, api_call_type = api_request("https://www.strava.com/api/v3/athlete/activities", headers, params, self.username, self.user_id, cache=cache)
             if api_call_type == API_CALL_TYPE.API:
                 num_of_API_requests += 1
             elif api_call_type == API_CALL_TYPE.Cache:
                 num_of_retrieve_Cache += 1
-
             if not data:
                 end_of_results = True
             else:
@@ -88,5 +91,5 @@ class Athlete:
             #check if the response is smaller than the Per_page limit, meaning that all results were retrieved
             if len(activities) < PER_PAGE:
                 end_of_results = True
-        return (data, num_of_API_requests, num_of_retrieve_Cache)
+        return (activities, num_of_API_requests, num_of_retrieve_Cache)
        

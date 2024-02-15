@@ -6,10 +6,10 @@ import threading
 import logging
 
 # Import the strava_auth function
-from controllers.strava_auth import strava_auth
-from controllers.stats import stats
+from src.web.controllers.strava_auth import strava_auth
+from src.web.controllers.stats import stats
 
-from config.log_config import setup_logging
+from src.shared.config.log_config import setup_logging
 
 setup_logging()
 logger = logging.getLogger(__name__)

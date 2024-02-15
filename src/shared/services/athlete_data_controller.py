@@ -1,5 +1,5 @@
 """
-file: auth_data_controller.py
+file: athlete_data_controller.py
 
 description: This module handles saving and loading athletes for the Discord bot.
 
@@ -12,11 +12,9 @@ import os
 from dotenv import load_dotenv
 import logging
 
-from config.log_config import setup_logging
 from threading import Lock
 
-from models.activity import Activity
-from models.athlete import Athlete
+from src.shared.config.log_config import setup_logging
 
 file_lock = Lock()  # locking mechanism for threading
 
@@ -27,13 +25,11 @@ load_dotenv()
 
 YEAR = int(os.getenv("YEAR", datetime.date.today().year))
 
-SRC_PATH = os.path.dirname(__file__)
-BASE_PATH = os.path.dirname(SRC_PATH)
-DATA_PATH = os.path.join(os.path.dirname(BASE_PATH), 'data')
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+DATA_PATH = os.path.join(PROJECT_ROOT, 'data')
 YEAR_PATH = os.path.join(DATA_PATH, str(YEAR))
 ATHLETES = os.path.join(YEAR_PATH, 'athletes.json')
-ROUTES = os.path.join(YEAR_PATH, 'routes.json')
-RULES_TEMPLATE = os.path.join(os.path.dirname(BASE_PATH), 'rules_template.json')
+RULES_TEMPLATE = os.path.join(PROJECT_ROOT, 'rules_template.json')
 GLOBAL_RULES_FILE = os.path.join(YEAR_PATH, 'global_rules.json')  # Path to the global_rules.json
 
 # Function to load rules from the JSON file
@@ -61,6 +57,7 @@ def save_strava_athletes(response: json = None, discord_user_id: str = None):
     This function takes a JSON string containing user athletes, 
     checks if a file for the user already exists, and either appends to or overwrites the file.
     """
+    #clear_week_results()
     with file_lock:
         logger.info("Saving Credentials.")
         if response:
@@ -93,7 +90,7 @@ def save_strava_athletes(response: json = None, discord_user_id: str = None):
         athlete['vars'] = athlete_vars
         athlete['discord_user_id'] = discord_user_id
 
-        data = load_or_create_athletes()
+        data = load_or_create_athletes_dir()
 
         # Update or append the new athletes
         for existing_cred in data:
@@ -111,7 +108,7 @@ def save_strava_athletes(response: json = None, discord_user_id: str = None):
 
 def update_athlete_vars(athlete: dict):
     with file_lock:
-        data = load_or_create_athletes()
+        data = load_or_create_athletes_dir()
         for existing_cred in data:
             if existing_cred['strava_data']['athlete']['id'] == athlete['strava_data']['athlete']['id']:
                 if athlete['vars']:
@@ -120,72 +117,19 @@ def update_athlete_vars(athlete: dict):
         with open(ATHLETES, 'w') as f:
             json.dump(data, f, default=serialize, indent=4)
 
-def clear_athlete_vars():
+def clear_week_results():
     """
-    Resets the athlete vars.
+    Resets the week_results.
     """
     with file_lock:
-        data = load_or_create_athletes()
+        data = load_or_create_athletes_dir()
         for existing_cred in data:
-            existing_cred["vars"] = {
-                "joker": 1,
-                "joker_weeks": [],
-                "week_results": []
-            }
-    
+            existing_cred["vars"]["week_results"] = []
         with open(ATHLETES, 'w') as f:
             json.dump(data, f, default=serialize, indent=4)
 
 
-def save_routes(activity: Activity, user: Athlete):
-    new_route = {
-        "user_id": user.user_id,
-        "discord_user_id": user.discord_id,
-        "user_name": user.username,
-        "activity_id": activity.id,
-        "type": activity.type,
-        "start_date": activity.start_date,
-        "moving_time": activity.duration,
-        "distance": activity.distance,
-        "total_elevation_gain": activity.elev_gain,
-        "map": activity.map
-    }
-    if new_route["map"]["summary_polyline"] == "":
-        return
-
-    with file_lock:
-        data = {"metadata": {"total_moving_time": 0, "total_distance": 0, "total_elevation_gain": 0}, "routes": []}
-        
-        if os.path.exists(ROUTES) and os.path.getsize(ROUTES) > 0:
-            with open(ROUTES, 'r') as file:
-                data = json.load(file)
-                
-        existing_route_index = next((index for (index, d) in enumerate(data["routes"]) if d["activity_id"] == new_route["activity_id"]), None)
-        
-        if existing_route_index is not None:
-            # Subtract old values from metadata
-            old_route = data["routes"][existing_route_index]
-            data["metadata"]["total_moving_time"] -= old_route.get("moving_time", 0)
-            data["metadata"]["total_distance"] -= old_route.get("distance", 0)
-            data["metadata"]["total_elevation_gain"] -= old_route.get("total_elevation_gain", 0)
-            
-            # Replace the existing route
-            data["routes"][existing_route_index] = new_route
-        else:
-            # Append the new route
-            data["routes"].append(new_route)
-        
-        # Add new values to metadata
-        data["metadata"]["total_moving_time"] += new_route.get("moving_time", 0)
-        data["metadata"]["total_distance"] += new_route.get("distance", 0)
-        data["metadata"]["total_elevation_gain"] += new_route.get("total_elevation_gain", 0)
-        
-        with open(ROUTES, 'w') as f:
-            json.dump(data, f, default=serialize, indent=4)
-
-
-
-def load_or_create_athletes():
+def load_or_create_athletes_dir():
     # Create the data directory if it doesn't exist
     if not os.path.exists(DATA_PATH):
         os.makedirs(DATA_PATH)

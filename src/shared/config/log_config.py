@@ -2,7 +2,7 @@ import logging
 
 from colorlog import ColoredFormatter
 
-def setup_logging(to_file=True):
+def setup_logging(to_file=False):
     log_format = '%(asctime)s - %(levelname)s - %(module)s - %(message)s'
     log_level = logging.INFO  # Set to DEBUG for verbose logging
 

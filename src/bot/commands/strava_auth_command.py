@@ -13,8 +13,8 @@ from dotenv import load_dotenv
 import discord
 import logging
 
-import services.data_controller as data_controller
-from config.log_config import setup_logging
+import src.shared.services.athlete_data_controller as athlete_data_controller
+from src.shared.config.log_config import setup_logging
 
 
 setup_logging()
@@ -68,5 +68,5 @@ def exchange_code(code:str, discord_user_id:str):
     if(response.status_code != 200):
         raise Exception(f"Failed to get token: Status code {response.status_code}, Response: {response.text}")
     
-    data_controller.save_strava_athletes(response.text, discord_user_id)
+    athlete_data_controller.save_strava_athletes(response.text, discord_user_id)
    

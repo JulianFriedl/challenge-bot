@@ -13,15 +13,14 @@ import requests
 import discord
 from enum import Enum
 
-from api.custom_api_error import CustomAPIError
+from src.shared.api.custom_api_error import CustomAPIError
 class API_CALL_TYPE(Enum):
     Cache = 1
     API = 2
     Error = 3
 
-SRC_PATH = os.path.dirname(__file__)
-BASE_PATH = os.path.dirname(SRC_PATH)
-CACHE_PATH = os.path.join(os.path.dirname(BASE_PATH), 'cache')
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+CACHE_PATH = os.path.join(PROJECT_ROOT, 'cache')
 os.makedirs(CACHE_PATH, exist_ok=True)  # make sure the directory exists
 
 def api_request(url:str, headers:dict, params:dict, username:str, user_id:str, cache:bool = True):

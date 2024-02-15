@@ -16,14 +16,15 @@ import asyncio
 import logging
 import traceback 
 
-from api.custom_api_error import CustomAPIError
-from flask_app import start_flask 
-from commands.joker_command import JokerCommand
-from commands.help_command import help_embed
-from commands.strava_auth_command import strava_auth
-from commands.total_command import TotalCommand
-from commands.week_command import WeekCommand
-from config.log_config import setup_logging
+from src.shared.api.custom_api_error import CustomAPIError
+from src.web.flask_app import start_flask 
+from src.bot.commands.joker_command import JokerCommand
+from src.bot.commands.help_command import help_embed
+from src.bot.commands.strava_auth_command import strava_auth
+from src.bot.commands.total_command import TotalCommand
+from src.bot.commands.week_command import WeekCommand
+from src.shared.config.log_config import setup_logging
+from src.shared.services.athlete_data_controller import clear_week_results
 
 
 setup_logging()
@@ -34,6 +35,7 @@ load_dotenv()
 
 # Get the Discord token from the .env file
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
+DISCORD_ADMIN_ID = os.getenv("DISCORD_ADMIN_ID")
 
 # Get the Client object from discord.py. Client is synonymous with Bot
 intents = discord.Intents.default()
@@ -122,6 +124,25 @@ async def joker_command(interaction: discord.Interaction):
     loop = asyncio.get_event_loop()
     embed_result = await loop.run_in_executor(None, JokerCommand(str(discord_user_id)).joker)
     await interaction.followup.send(embed=embed_result)
+
+@bot.tree.command(name="clear_weeks", description="Admin Command.")
+async def clear_weeks(interaction: discord.Interaction):
+    """Slash Command Implementation of Clear Week results"""
+    discord_user_id = str(interaction.user.id)  # Ensure it's a string for comparison
+
+    # Check if the user is not an admin
+    if discord_user_id != DISCORD_ADMIN_ID:
+        await interaction.response.send_message("You do not have permission to use this command.", ephemeral=True)
+        return
+
+    # If the user is the admin, proceed with the command
+    await interaction.response.defer(ephemeral=True)
+    loop = asyncio.get_event_loop()
+
+    # Assuming clear_week_results() is defined elsewhere and does not need arguments
+    await loop.run_in_executor(None, clear_week_results)
+    await interaction.followup.send("Weeks cleared.")
+
 
 
 # Execute the bot with the specified token

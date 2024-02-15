@@ -26,7 +26,7 @@ This documentation provides instructions for setting up a Python application as 
     User=your_user
     Group=your_user
     WorkingDirectory=/path/to/your/application
-    ExecStart=/usr/bin/python3(Alternatively to the python virtual env) /path/to/your/application/app.py
+    ExecStart=/usr/bin/python3(Alternatively to the python virtual env) /path/to/your/application/app.py(-m path.to.your.app   Alternatively if you want to exec with -m)
     Restart=always
 
     [Install]
