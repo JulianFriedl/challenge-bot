@@ -61,6 +61,7 @@ Set up your environment variables by creating a `.env` file in the project's roo
 
 ```plaintext
 DISCORD_TOKEN=YOUR_DISCORD_BOT_TOKEN
+DISCORD_ADMIN_ID= YOUR_DISCORD_USER_ID
 STRAVA_CLIENT_ID=YOUR_STRAVA_CLIENT_ID
 STRAVA_CLIENT_SECRET=YOUR_STRAVA_CLIENT_SECRET
 REDIRECT_URI=http://YOUR_ADDRESS/strava_auth

@@ -1,6 +1,9 @@
 discord==1.7.3
 python-dotenv==0.19.2
-requests==2.26.0
+requests==2.27
 waitress==2.0.0
 Flask==2.3.2
+flask-cors==4.0.0
 colorlog==6.8.2
+polyline==2.0.2
+geopy==2.4.1

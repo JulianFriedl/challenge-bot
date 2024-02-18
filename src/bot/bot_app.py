@@ -17,7 +17,7 @@ import logging
 import traceback 
 
 from src.shared.api.custom_api_error import CustomAPIError
-from src.web.flask_app import start_flask 
+from src.web.backend.flask_app import start_flask 
 from src.bot.commands.joker_command import JokerCommand
 from src.bot.commands.help_command import help_embed
 from src.bot.commands.strava_auth_command import strava_auth

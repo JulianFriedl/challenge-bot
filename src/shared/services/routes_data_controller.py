@@ -11,6 +11,8 @@ import json
 import os
 from dotenv import load_dotenv
 import logging
+import polyline
+from geopy.distance import geodesic
 
 from src.shared.config.log_config import setup_logging
 from threading import Lock
@@ -53,6 +55,9 @@ def save_routes(activity:Activity, user:Athlete):
 
     if new_route["map"]["summary_polyline"] == "":
         return
+    
+    if new_route["type"] == "VirtualRide":
+        return
 
     with file_lock:
         if os.path.exists(ROUTES) and os.path.getsize(ROUTES) > 0:
@@ -91,6 +96,24 @@ def save_routes(activity:Activity, user:Athlete):
         with open(ROUTES, 'w') as f:
             json.dump(data, f, default=serialize, indent=4)
 
+def load_routes(years:str):
+    all_data = {}
+    for year in years.split(','):
+        YEAR_PATH = os.path.join(DATA_PATH, str(year))
+        ROUTES = os.path.join(YEAR_PATH, 'routes.json')
+        if os.path.exists(ROUTES) and os.path.getsize(ROUTES) > 0:
+            with open(ROUTES) as file:
+                data = json.load(file)
+            all_data[str(year)] = data
+        else:
+            all_data[str(year)] = {}  
+    return all_data
+
+def available_years():
+    years = [name for name in os.listdir(DATA_PATH) 
+                if os.path.isdir(os.path.join(DATA_PATH, name)) 
+                and name.isdigit()]  # Ensure directory names are digits
+    return sorted(years)  # Return sorted list of years
 
 def serialize(obj):
     """
