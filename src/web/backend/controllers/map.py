@@ -38,5 +38,7 @@ def map():
             
             if filtered_athletes:
                 filtered_data[year] = {'athletes': filtered_athletes}
+    
+    
     return jsonify(filtered_data)
 

@@ -21,7 +21,7 @@ load_dotenv()
 
 app = Flask(__name__)
 # Allow both localhost and 127.0.0.1, with and without port numbers, as origins
-CORS(app, resources={r"/api/*": {"origins": ["http://localhost:5000", "http://127.0.0.1:5000", "http://localhost:8000", "http://127.0.0.1:8000"]}})
+CORS(app, resources={r"/api/*": {"origins": ["http://localhost:5000", "http://127.0.0.1:5000", "http://localhost:8000", "http://127.0.0.1:8000", "http://stravascape.site"]}})
 
 # Register the strava_auth function as a route
 app.route('/strava_auth')(strava_auth)
