@@ -1,6 +1,6 @@
 # challenge-bot
 
-A bot for Discord, that connects to the Strava API and retrieves and evaluates certain data for a Strava challenge between friends. 
+A bot for Discord, that connects to the Strava API and retrieves and evaluates activity data for a Strava challenge between friends. 
 
 ## Requirements
 
