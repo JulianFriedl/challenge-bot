@@ -71,7 +71,7 @@ YEAR=The Year of the Challenge
 
 ### Running the Application
 
-To start the Discord bot and the Flask web server, navigate to the project root and run the application using the `-m` flag. This approach respects the package structure of your project:
+To start the Discord bot and the Flask web server, navigate to the project root and run the application using the `-m` flag:
 
 ```bash
 python3 -m src.bot.bot_app
@@ -92,6 +92,6 @@ https://discord.com/api/oauth2/authorize?client_id=YOUR_CLIENT_ID&permissions=20
 - Send a `/strava_auth` command to the bot in a direct message. The bot will send you a link to the Strava authorization page.
 - Grant permission for the bot to access your data.
 - You'll be redirected back to the Flask web server, which will extract the authorization code and pass it back to the bot.
-- The bot will exchange the authorization code for an access token and use it to make requests to the Strava API on your behalf.
+- The bot will exchange the authorization code for an access token and use it to make requests to the Strava API.
 
 Now, your setup should be complete, and you can use the bot to evaluate the performance of registered users in the challenge.
